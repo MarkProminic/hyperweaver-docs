@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.2](https://github.com/MarkProminic/hyperweaver-docs/compare/v0.1.1...v0.1.2) (2026-07-03)
+
+
+### Bug Fixes
+
+* also publish a version-less docs artifact for latest-download ([b4aa856](https://github.com/MarkProminic/hyperweaver-docs/commit/b4aa856285747239f58e47de7fb69dbe147f1af6))
+
 ## [0.1.1](https://github.com/MarkProminic/hyperweaver-docs/compare/v0.1.0...v0.1.1) (2026-07-03)
 
 
