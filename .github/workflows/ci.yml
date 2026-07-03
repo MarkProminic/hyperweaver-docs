@@ -1,26 +1,30 @@
-name: Docs CI
+name: CI
 
-# Build the site and lint the output on every PR + push. Mirrors the quality gate
-# the docs had in hyperweaver-server (html-proofer link checking).
+# Reusable CI. Called by release-please.yml on push to main, and run directly on
+# every PR. Lints, builds the Jekyll site, link-checks it (html-proofer), then
+# chains CodeQL — same layout as hyperweaver-server / hyperweaver-ui.
 
 on:
+  workflow_call:
   pull_request:
-  push:
-    branches: [main]
+    branches: ['main']
 
 permissions:
   contents: read
+  security-events: write
+  packages: read
+  actions: read
 
 jobs:
-  build-and-proof:
-    name: Build + HTML lint
+  lint-and-format:
+    name: Lint & Format
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v5
+      - name: Checkout code
+        uses: actions/checkout@v7
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '22'
           cache: 'npm'
@@ -28,11 +32,27 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Lint (ESLint)
+      - name: Run ESLint
         run: npm run lint
 
-      - name: Check formatting (Prettier)
+      - name: Check Prettier formatting
         run: npm run format:check
+
+  build:
+    name: Build & Link Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
 
       - name: Generate docs assets (Swagger shells + changelogs)
         run: npm run generate-docs
@@ -59,3 +79,8 @@ jobs:
             --allow-hash-href \
             --swap-urls "^/docs:" \
             --ignore-urls "/favicon.ico,/images/logo192.png,/images/logo512.png"
+
+  codeql-analysis:
+    name: CodeQL
+    needs: [lint-and-format, build]
+    uses: ./.github/workflows/codeql.yml

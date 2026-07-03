@@ -1,18 +1,50 @@
 name: Release Please
 
+# Single entry point on push to main: run CI (which chains CodeQL), then
+# release-please, then — only when a release is cut — build and publish the docs
+# artifact. Same orchestration as hyperweaver-server / hyperweaver-ui.
+
 on:
   push:
-    branches: [main]
+    branches:
+      - main
 
 permissions:
   contents: write
   pull-requests: write
+  issues: write
+  actions: write
+  security-events: write
+  packages: read
 
 jobs:
+  ci-checks:
+    name: CI Checks
+    uses: ./.github/workflows/ci.yml
+
   release-please:
+    name: Release Please
+    needs: ci-checks
     runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+      major: ${{ steps.release.outputs.major }}
+      minor: ${{ steps.release.outputs.minor }}
+      patch: ${{ steps.release.outputs.patch }}
     steps:
-      - uses: googleapis/release-please-action@v4
-        with:
-          config-file: release-please-config.json
-          manifest-file: .release-please-manifest.json
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Release Please
+        uses: googleapis/release-please-action@v4
+        id: release
+
+  build-docs:
+    name: Build Docs Artifact
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created }}
+    uses: ./.github/workflows/build-docs.yml
+    with:
+      version: ${{ needs.release-please.outputs.major }}.${{ needs.release-please.outputs.minor }}.${{ needs.release-please.outputs.patch }}
+      tag_name: ${{ needs.release-please.outputs.tag_name }}

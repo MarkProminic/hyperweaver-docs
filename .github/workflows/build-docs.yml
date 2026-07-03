@@ -1,30 +1,54 @@
-name: Build and Publish Docs Artifact
+name: Build Docs Artifact
 
-# Builds the Jekyll site and publishes hyperweaver-docs-{version}.tar.gz as a
-# release asset. The Hyperweaver UI build fetches this tarball into dist/docs, so
-# every backend that embeds the UI serves /docs with no docs pipeline of its own.
+# Reusable: called by release-please.yml when a release is created (and available
+# via manual dispatch). Builds the Jekyll site and publishes
+# hyperweaver-docs-{version}.tar.gz as a release asset. The Hyperweaver UI build
+# fetches this tarball into dist/docs, so every backend that embeds the UI serves
+# /docs with no docs pipeline of its own.
 
 on:
-  release:
-    types: [published]
+  workflow_call:
+    inputs:
+      version:
+        description: 'Version to build'
+        required: true
+        type: string
+      tag_name:
+        description: 'GitHub release tag'
+        required: true
+        type: string
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to build'
+        required: true
+        type: string
+      tag_name:
+        description: 'GitHub release tag'
+        required: true
+        type: string
 
 permissions:
   contents: write
 
 jobs:
-  build:
+  build-and-upload:
+    name: Build & Upload
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '22'
+          cache: 'npm'
 
-      - name: Generate Swagger UI shells
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate docs assets (Swagger shells + changelogs)
         run: npm run generate-docs
 
       - name: Setup Ruby
@@ -39,15 +63,9 @@ jobs:
         env:
           JEKYLL_ENV: production
 
-      - name: Package artifact
-        run: |
-          VERSION=$(node -p "require('./package.json').version")
-          echo "VERSION=${VERSION}" >> "$GITHUB_ENV"
-          tar -czf "hyperweaver-docs-${VERSION}.tar.gz" -C _site .
-
-      - name: Upload artifact to release
+      - name: Package and upload docs artifact
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release upload "${{ github.event.release.tag_name }}" \
-            "hyperweaver-docs-${VERSION}.tar.gz" --clobber
+          tar -czf "hyperweaver-docs-${{ inputs.version }}.tar.gz" -C _site .
+          gh release upload "${{ inputs.tag_name }}" "hyperweaver-docs-${{ inputs.version }}.tar.gz" --clobber
