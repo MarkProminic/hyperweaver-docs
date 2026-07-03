@@ -1,0 +1,52 @@
+name: Build and Publish Docs Artifact
+
+# Builds the Jekyll site and publishes hyperweaver-docs-{version}.tar.gz as a
+# release asset. The Hyperweaver UI build fetches this tarball into dist/docs, so
+# every backend that embeds the UI serves /docs with no docs pipeline of its own.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Generate Swagger UI shells
+        run: npm run generate-docs
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+          bundler-cache: true
+
+      - name: Build with Jekyll
+        run: bundle exec jekyll build
+        env:
+          JEKYLL_ENV: production
+
+      - name: Package artifact
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "VERSION=${VERSION}" >> "$GITHUB_ENV"
+          tar -czf "hyperweaver-docs-${VERSION}.tar.gz" -C _site .
+
+      - name: Upload artifact to release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload "${{ github.event.release.tag_name }}" \
+            "hyperweaver-docs-${VERSION}.tar.gz" --clobber

@@ -1,0 +1,191 @@
+<!-- Custom head content for Hyperweaver Server Documentation -->
+<link rel="icon" type="image/x-icon" href="{{ '/web/public/favicon.ico' | relative_url }}" />
+<link
+  rel="apple-touch-icon"
+  sizes="192x192"
+  href="{{ '/web/public/images/logo192.png' | relative_url }}"
+/>
+<link
+  rel="apple-touch-icon"
+  sizes="512x512"
+  href="{{ '/web/public/images/logo512.png' | relative_url }}"
+/>
+
+<!-- Dynamic version loading for releases page -->
+<script type="text/javascript">
+  document.addEventListener('DOMContentLoaded', function () {
+    if (window.location.pathname.includes('/releases/')) {
+      var releaseDiv = document.getElementById('latest-release-content');
+      if (releaseDiv) {
+        fetch(
+          'https://raw.githubusercontent.com/Makr91/hyperweaver-server/refs/heads/main/package.json'
+        )
+          .then(function (response) {
+            return response.json();
+          })
+          .then(function (data) {
+            releaseDiv.innerHTML =
+              '<p><strong>Version v' + data.version + '</strong> - Current Build</p>';
+            // OmniOS .p5p download link — PARKED (re-enable alongside OmniOS builds)
+            // var p5pLink = document.querySelector('a[href*="zoneweaver.p5p"]');
+            // if (p5pLink) {
+            //   p5pLink.href =
+            //     'https://github.com/Makr91/hyperweaver-server/releases/latest/download/zoneweaver-' +
+            //     data.version +
+            //     '.p5p';
+            // }
+            var debLink = document.querySelector('a[href*="hyperweaver-server.deb"]');
+            if (debLink) {
+              debLink.href =
+                'https://github.com/Makr91/hyperweaver-server/releases/latest/download/hyperweaver-server_' +
+                data.version +
+                '_amd64.deb';
+            }
+          });
+      }
+    }
+  });
+</script>
+
+<!-- Dynamic version loading for changelog page -->
+<script type="text/javascript">
+  document.addEventListener('DOMContentLoaded', function () {
+    if (window.location.pathname.includes('/changelog/')) {
+      var releaseDiv = document.getElementById('latest-release-content');
+      if (releaseDiv) {
+        fetch(
+          'https://raw.githubusercontent.com/Makr91/hyperweaver-server/refs/heads/main/package.json'
+        )
+          .then(function (response) {
+            return response.json();
+          })
+          .then(function (data) {
+            releaseDiv.innerHTML =
+              '<p><strong>Version v' + data.version + '</strong> - Current Build</p>';
+          });
+      }
+    }
+  });
+</script>
+
+<!-- Dynamic version loading for security page -->
+<script type="text/javascript">
+  document.addEventListener('DOMContentLoaded', function () {
+    if (window.location.pathname.includes('/security/')) {
+      var versionsDiv = document.getElementById('supported-versions-content');
+      if (versionsDiv) {
+        fetch('https://api.github.com/repos/Makr91/hyperweaver-server/releases')
+          .then(function (response) {
+            return response.json();
+          })
+          .then(function (releases) {
+            var html =
+              '<table><thead><tr><th>Version</th><th>Release Date</th><th>Supported</th><th>Download</th></tr></thead><tbody>';
+            var count = 0;
+
+            for (var i = 0; i < releases.length && count < 5; i++) {
+              var release = releases[i];
+              if (!release.draft && !release.prerelease) {
+                var releaseDate = new Date(release.published_at).toLocaleDateString();
+                var isSupported = count < 3;
+                var supportIcon = isSupported ? '✅' : '❌';
+
+                html += '<tr>';
+                html += '<td><a href="' + release.html_url + '">' + release.tag_name + '</a></td>';
+                html += '<td>' + releaseDate + '</td>';
+                html += '<td>' + supportIcon + '</td>';
+                html += '<td><a href="' + release.html_url + '">Download</a></td>';
+                html += '</tr>';
+                count++;
+              }
+            }
+
+            html += '</tbody></table>';
+            html += '<p><em>Last updated: ' + new Date().toLocaleDateString() + '</em></p>';
+
+            versionsDiv.innerHTML = html;
+          })
+          .catch(function (error) {
+            versionsDiv.innerHTML = '<p><em>Error loading versions</em></p>';
+          });
+      }
+    }
+  });
+</script>
+
+<!-- Merged docs: Zoneweaver Agent (separate repo) — same runtime hack, agent repo.
+     Distinct element IDs, so the Hyperweaver Server loaders above no-op here (their
+     getElementById guards return null on these pages). -->
+
+<!-- Dynamic version loading for the Zoneweaver Agent releases page -->
+<script type="text/javascript">
+  document.addEventListener('DOMContentLoaded', function () {
+    if (window.location.pathname.includes('/zoneweaver-agent/releases/')) {
+      var releaseDiv = document.getElementById('agent-latest-release-content');
+      if (releaseDiv) {
+        fetch(
+          'https://raw.githubusercontent.com/Makr91/zoneweaver-agent/refs/heads/main/package.json'
+        )
+          .then(function (response) {
+            return response.json();
+          })
+          .then(function (data) {
+            releaseDiv.innerHTML =
+              '<p><strong>Version v' + data.version + '</strong> - Current Build</p>';
+            var p5pLink = document.querySelector('a[href*="zoneweaver-agent.p5p"]');
+            if (p5pLink) {
+              p5pLink.href =
+                'https://github.com/Makr91/zoneweaver-agent/releases/latest/download/zoneweaver-agent-' +
+                data.version +
+                '.p5p';
+            }
+          });
+      }
+    }
+  });
+</script>
+
+<!-- Dynamic changelog for the Zoneweaver Agent (renders its GitHub releases) -->
+<script type="text/javascript">
+  document.addEventListener('DOMContentLoaded', function () {
+    if (window.location.pathname.includes('/zoneweaver-agent/changelog/')) {
+      var el = document.getElementById('agent-changelog-content');
+      if (el) {
+        fetch('https://api.github.com/repos/Makr91/zoneweaver-agent/releases')
+          .then(function (response) {
+            return response.json();
+          })
+          .then(function (releases) {
+            if (!Array.isArray(releases) || releases.length === 0) {
+              el.innerHTML =
+                '<p><em>No releases published yet. See <a href="https://github.com/Makr91/zoneweaver-agent/releases">GitHub releases</a>.</em></p>';
+              return;
+            }
+            var esc = function (s) {
+              return String(s).replace(/[<>&]/g, function (c) {
+                return { '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c];
+              });
+            };
+            var html = '';
+            releases.forEach(function (rel) {
+              if (rel.draft) {
+                return;
+              }
+              var date = new Date(rel.published_at).toLocaleDateString();
+              html +=
+                '<h2>' + esc(rel.tag_name || rel.name) + ' <small>(' + date + ')</small></h2>';
+              html +=
+                '<pre style="white-space:pre-wrap">' +
+                (rel.body ? esc(rel.body) : 'No release notes.') +
+                '</pre>';
+            });
+            el.innerHTML = html;
+          })
+          .catch(function () {
+            el.innerHTML =
+              '<p><em>Error loading changelog. See <a href="https://github.com/Makr91/zoneweaver-agent/releases">GitHub releases</a>.</em></p>';
+          });
+      }
+    }
+  });
+</script>
