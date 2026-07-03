@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.3](https://github.com/MarkProminic/hyperweaver-docs/compare/v0.1.2...v0.1.3) (2026-07-03)
+
+
+### Bug Fixes
+
+* bump release-please ([efe48a5](https://github.com/MarkProminic/hyperweaver-docs/commit/efe48a552b3789c0c3d6f6cd33f228ed8ea69abb))
+* github template issues ([4f1dd54](https://github.com/MarkProminic/hyperweaver-docs/commit/4f1dd54d2b440b78e340843a5aab3afdded5f691))
+
 ## [0.1.2](https://github.com/MarkProminic/hyperweaver-docs/compare/v0.1.1...v0.1.2) (2026-07-03)
 
 
