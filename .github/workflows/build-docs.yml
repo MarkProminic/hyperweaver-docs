@@ -1,10 +1,11 @@
 name: Build Docs Artifact
 
 # Reusable: called by release-please.yml when a release is created (and available
-# via manual dispatch). Builds the Jekyll site and publishes
-# hyperweaver-docs-{version}.tar.gz as a release asset. The Hyperweaver UI build
-# fetches this tarball into dist/docs, so every backend that embeds the UI serves
-# /docs with no docs pipeline of its own.
+# via manual dispatch). Builds the Jekyll site and publishes two release assets:
+# hyperweaver-docs-{version}.tar.gz (versioned, for provenance) and a version-less
+# hyperweaver-docs.tar.gz. The Hyperweaver UI build fetches the version-less asset
+# via releases/latest/download into dist/docs — so every backend that embeds the UI
+# serves current /docs with no docs pipeline of its own, and nothing to pin.
 
 on:
   workflow_call:
@@ -68,4 +69,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           tar -czf "hyperweaver-docs-${{ inputs.version }}.tar.gz" -C _site .
-          gh release upload "${{ inputs.tag_name }}" "hyperweaver-docs-${{ inputs.version }}.tar.gz" --clobber
+          cp "hyperweaver-docs-${{ inputs.version }}.tar.gz" hyperweaver-docs.tar.gz
+          gh release upload "${{ inputs.tag_name }}" \
+            "hyperweaver-docs-${{ inputs.version }}.tar.gz" \
+            "hyperweaver-docs.tar.gz" --clobber
