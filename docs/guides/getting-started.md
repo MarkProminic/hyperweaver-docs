@@ -89,10 +89,10 @@ Edit `/etc/hyperweaver-server/config.yaml` (package install) or `./config.yaml` 
 
 ## Next Steps
 
-1. **[Authentication](authentication/)** — user management, OIDC, and LDAP
-2. **[Backend Integration](backend-integration/)** — connecting Zoneweaver Agents in depth
-3. **[Installation](installation/)** — production deployment
+1. **[Authentication](../authentication/)** — user management, OIDC, and LDAP
+2. **[Backend Integration](../backend-integration/)** — connecting Zoneweaver Agents in depth
+3. **[Installation](../installation/)** — production deployment
 
 ---
 
-Need help? See the [Support](../support/) page or the [GitHub repository](https://github.com/Makr91/hyperweaver-server).
+Need help? See the [Support](../../support/) page or the [GitHub repository](https://github.com/Makr91/hyperweaver-server).

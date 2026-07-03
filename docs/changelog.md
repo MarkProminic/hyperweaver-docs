@@ -20,8 +20,4 @@ Release history and changes for Hyperweaver Server frontend.
 
 ---
 
-<div id="latest-release-content">
-  <p><em>Loading latest release information...</em></p>
-</div>
-
-{% include CHANGELOG.md %}
+{% include changelogs/hyperweaver-server.md %}

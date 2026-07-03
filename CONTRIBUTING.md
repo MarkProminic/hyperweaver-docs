@@ -81,15 +81,15 @@ If you need help with contributing:
 
 ## Recognition
 
-All contributors are recognized in our [AUTHORS.md](AUTHORS.md) file. We appreciate every contribution, from small bug fixes to major features!
+All contributors are recognized in our [AUTHORS.md](/docs/authors/) file. We appreciate every contribution, from small bug fixes to major features!
 
 ## Code of Conduct
 
-Please note that this project follows our [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you agree to abide by its terms.
+Please note that this project follows our [Code of Conduct](/docs/code-of-conduct/). By participating, you agree to abide by its terms.
 
 ## License
 
-By contributing to Hyperweaver Server, you agree that your contributions will be licensed under the [GPL-3.0 License](LICENSE.md).
+By contributing to Hyperweaver Server, you agree that your contributions will be licensed under the [GPL-3.0 License](/docs/license/).
 
 ---
 

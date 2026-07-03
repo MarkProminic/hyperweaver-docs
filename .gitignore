@@ -18,6 +18,9 @@ docs/zoneweaver-agent/api/swagger-ui.html
 # Baked OpenAPI spec — specs are fetched live at runtime now, never bundled
 docs/api/openapi.json
 
+# Component changelogs — fetched from each repo at build by scripts/generate-docs.js
+changelogs/
+
 # OS / editor cruft
 .DS_Store
 Thumbs.db

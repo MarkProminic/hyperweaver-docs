@@ -81,6 +81,9 @@ exclude:
   - SUPPORT.md
   - nodemon.json
   - release-please-config.json
+  # Build-fetched component changelogs — {% include %}-d into the changelog pages,
+  # not published standalone (the include still resolves from source)
+  - changelogs/
 
 # Theme settings
 theme: just-the-docs

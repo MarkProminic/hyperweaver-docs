@@ -7,16 +7,18 @@ permalink: /zoneweaver-agent/guides/provisioning/
 ---
 
 # Provisioning Pipeline Guide
+
 {: .no_toc }
 
 Complete guide to the Zoneweaver Agent provisioning pipeline for automated zone configuration.
 {: .fs-6 .fw-300 }
 
 ## Table of contents
+
 {: .no_toc .text-delta }
 
 1. TOC
-{:toc}
+   {:toc}
 
 ---
 
@@ -175,13 +177,13 @@ Recipes are zlogin automation templates for configuring networking via the zone'
 
 Zoneweaver Agent ships with 5 default recipes:
 
-| Name | OS Family | Description |
-|------|-----------|-------------|
-| `debian-netplan` | Linux | Debian 12+, Ubuntu 18+ (netplan) |
-| `linux-ifconfig` | Linux | Older Linux (ifconfig/interfaces) |
-| `omnios-dladm` | Solaris | OmniOS/illumos (dladm/ipadm) |
-| `windows-sac` | Windows | Windows Server (SAC console + netsh) |
-| `cloud-init-wait` | Linux | Wait for cloud-init (no automation) |
+| Name              | OS Family | Description                          |
+| ----------------- | --------- | ------------------------------------ |
+| `debian-netplan`  | Linux     | Debian 12+, Ubuntu 18+ (netplan)     |
+| `linux-ifconfig`  | Linux     | Older Linux (ifconfig/interfaces)    |
+| `omnios-dladm`    | Solaris   | OmniOS/illumos (dladm/ipadm)         |
+| `windows-sac`     | Windows   | Windows Server (SAC console + netsh) |
+| `cloud-init-wait` | Linux     | Wait for cloud-init (no automation)  |
 
 ### Recipe Structure
 
@@ -216,13 +218,13 @@ Zoneweaver Agent ships with 5 default recipes:
 
 ### Recipe Step Types
 
-| Type | Purpose | Example |
-|------|---------|---------|
-| `wait` | Wait for pattern in console output | `{"type": "wait", "pattern": "login:", "timeout": 60}` |
-| `send` | Send text to console | `{"type": "send", "value": "root\\r\\n"}` |
-| `command` | Execute command, verify exit code | `{"type": "command", "value": "netplan apply"}` |
+| Type       | Purpose                                 | Example                                                         |
+| ---------- | --------------------------------------- | --------------------------------------------------------------- |
+| `wait`     | Wait for pattern in console output      | `{"type": "wait", "pattern": "login:", "timeout": 60}`          |
+| `send`     | Send text to console                    | `{"type": "send", "value": "root\\r\\n"}`                       |
+| `command`  | Execute command, verify exit code       | `{"type": "command", "value": "netplan apply"}`                 |
 | `template` | Write file via echo redirect or heredoc | `{"type": "template", "dest": "/etc/config", "content": "..."}` |
-| `delay` | Wait N seconds | `{"type": "delay", "seconds": 5}` |
+| `delay`    | Wait N seconds                          | `{"type": "delay", "seconds": 5}`                               |
 
 ### Variable Resolution
 
@@ -244,6 +246,7 @@ Variables are resolved at execution time using `{{variable}}` syntax:
 ```
 
 Variables can come from:
+
 - Recipe defaults (`recipe.variables`)
 - Provisioning config (`provisioning.variables`)
 - Runtime overrides (via API request)
@@ -308,10 +311,7 @@ Execute bash scripts via SSH:
 ```json
 {
   "type": "shell",
-  "scripts": [
-    "/vagrant/scripts/setup.sh",
-    "/vagrant/scripts/configure.sh"
-  ],
+  "scripts": ["/vagrant/scripts/setup.sh", "/vagrant/scripts/configure.sh"],
   "run_as": "root",
   "env": {
     "APP_ENV": "production"
@@ -334,9 +334,7 @@ Run ansible-playbook **on the host** targeting the zone:
     "app_version": "1.2.3",
     "domain": "example.com"
   },
-  "collections": [
-    "startcloud.startcloud_roles"
-  ]
+  "collections": ["startcloud.startcloud_roles"]
 }
 ```
 
@@ -356,9 +354,7 @@ Run ansible-playbook **inside the zone**:
   "extra_vars": {
     "hostname": "web01"
   },
-  "collections": [
-    "startcloud.startcloud_roles"
-  ]
+  "collections": ["startcloud.startcloud_roles"]
 }
 ```
 
@@ -435,6 +431,7 @@ Provisioning files are stored in a per-zone ZFS dataset:
 ```
 
 Benefits:
+
 - **Snapshots**: Rollback on provisioning failure
 - **Quotas**: Limit provisioning file size
 - **Compression**: Automatic compression of provisioning data
@@ -444,10 +441,10 @@ Benefits:
 
 Two automatic snapshots:
 
-| Snapshot | When | Purpose |
-|----------|------|---------|
-| `@pre-provision` | Before provisioning | Rollback point if provisioners fail |
-| `@post-provision` | After success | Known-good state |
+| Snapshot          | When                | Purpose                             |
+| ----------------- | ------------------- | ----------------------------------- |
+| `@pre-provision`  | Before provisioning | Rollback point if provisioners fail |
+| `@post-provision` | After success       | Known-good state                    |
 
 ### Rollback
 
@@ -459,6 +456,7 @@ curl -X POST https://hv-04-backend.home.m4kr.net:5001/zones/web-server-01/provis
 ```
 
 This executes:
+
 ```bash
 pfexec zfs rollback rpool/zones/web-server-01/provisioning@pre-provision
 ```
@@ -472,6 +470,7 @@ pfexec zfs rollback rpool/zones/web-server-01/provisioning@pre-provision
 **Symptom**: Recipe times out waiting for login prompt
 
 **Solutions**:
+
 - Check boot_string, login_prompt, shell_prompt patterns
 - Use `POST /provisioning/recipes/{id}/test` with `dry_run: false` to see actual output
 - Increase `timeout_seconds` if OS boots slowly
@@ -482,6 +481,7 @@ pfexec zfs rollback rpool/zones/web-server-01/provisioning@pre-provision
 **Symptom**: zone_wait_ssh task times out
 
 **Solutions**:
+
 - Verify recipe actually configured networking (check recipe execution log)
 - Confirm zone IP is correct in provisioning config
 - Check zone can reach provisioning network: `pfexec zlogin zone-name ping 10.190.190.1`
@@ -492,6 +492,7 @@ pfexec zfs rollback rpool/zones/web-server-01/provisioning@pre-provision
 **Symptom**: zone_provision task fails with exit code error
 
 **Solutions**:
+
 - Check task output for stderr
 - SSH into zone manually and run playbook/script to debug
 - Check `/vagrant` directory exists and files synced correctly
@@ -502,6 +503,7 @@ pfexec zfs rollback rpool/zones/web-server-01/provisioning@pre-provision
 **Symptom**: Provisioning fails before boot
 
 **Solutions**:
+
 - Verify artifact uploaded successfully
 - Check artifact is a valid tar.gz: `file artifact.tar.gz`
 - Ensure ZFS pool has space: `pfexec zfs list -o space`
@@ -512,6 +514,7 @@ pfexec zfs rollback rpool/zones/web-server-01/provisioning@pre-provision
 **Symptom**: @pre-provision snapshot not found
 
 **Solutions**:
+
 - Snapshot is created only if artifact extraction succeeds
 - Check ZFS snapshots manually: `pfexec zfs list -t snapshot | grep pre-provision`
 - If missing, re-run provisioning from scratch
@@ -569,39 +572,39 @@ provisioning/
 
 ### Provisioning Pipeline Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/zones/:name/provision` | Start provisioning pipeline |
-| `GET` | `/zones/:name/provision/status` | Get provisioning status |
-| `POST` | `/zones/:name/provision/cancel` | Cancel running provisioning |
-| `POST` | `/zones/:name/provision/rollback` | Rollback to @pre-provision |
+| Method | Endpoint                          | Description                 |
+| ------ | --------------------------------- | --------------------------- |
+| `POST` | `/zones/:name/provision`          | Start provisioning pipeline |
+| `GET`  | `/zones/:name/provision/status`   | Get provisioning status     |
+| `POST` | `/zones/:name/provision/cancel`   | Cancel running provisioning |
+| `POST` | `/zones/:name/provision/rollback` | Rollback to @pre-provision  |
 
 ### Recipe Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/provisioning/recipes` | List all recipes |
-| `POST` | `/provisioning/recipes` | Create recipe |
-| `GET` | `/provisioning/recipes/:id` | Get recipe details |
-| `PUT` | `/provisioning/recipes/:id` | Update recipe |
-| `DELETE` | `/provisioning/recipes/:id` | Delete recipe |
-| `POST` | `/provisioning/recipes/:id/test` | Test recipe (dry-run) |
+| Method   | Endpoint                         | Description           |
+| -------- | -------------------------------- | --------------------- |
+| `GET`    | `/provisioning/recipes`          | List all recipes      |
+| `POST`   | `/provisioning/recipes`          | Create recipe         |
+| `GET`    | `/provisioning/recipes/:id`      | Get recipe details    |
+| `PUT`    | `/provisioning/recipes/:id`      | Update recipe         |
+| `DELETE` | `/provisioning/recipes/:id`      | Delete recipe         |
+| `POST`   | `/provisioning/recipes/:id/test` | Test recipe (dry-run) |
 
 ### Profile Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/provisioning/profiles` | List all profiles |
-| `POST` | `/provisioning/profiles` | Create profile |
-| `GET` | `/provisioning/profiles/:id` | Get profile details |
-| `PUT` | `/provisioning/profiles/:id` | Update profile |
-| `DELETE` | `/provisioning/profiles/:id` | Delete profile |
+| Method   | Endpoint                     | Description         |
+| -------- | ---------------------------- | ------------------- |
+| `GET`    | `/provisioning/profiles`     | List all profiles   |
+| `POST`   | `/provisioning/profiles`     | Create profile      |
+| `GET`    | `/provisioning/profiles/:id` | Get profile details |
+| `PUT`    | `/provisioning/profiles/:id` | Update profile      |
+| `DELETE` | `/provisioning/profiles/:id` | Delete profile      |
 
 ---
 
 ## Next Steps
 
-- [Network Management Guide](network-management.md) - Setup provisioning network
-- [Zone Management Guide](zone-management.md) - Zone lifecycle operations
-- [Configuration Reference](../configuration.md) - Provisioning config options
-- [API Documentation](/api-docs) - Full API reference
+- [Network Management Guide](../network-management/) - Setup provisioning network
+- [Zone Management Guide](../zone-management/) - Zone lifecycle operations
+- [Configuration Reference](../../configuration/) - Provisioning config options
+- [API Documentation](../../api/) - Full API reference

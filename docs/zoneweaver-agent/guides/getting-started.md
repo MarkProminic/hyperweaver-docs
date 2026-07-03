@@ -7,15 +7,17 @@ permalink: /zoneweaver-agent/guides/getting-started/
 ---
 
 # Getting Started
+
 {: .no_toc }
 
 This guide will walk you through setting up and configuring the Zoneweaver Agent for the first time.
 
 ## Table of contents
+
 {: .no_toc .text-delta }
 
 1. TOC
-{:toc}
+   {:toc}
 
 ---
 
@@ -93,8 +95,8 @@ Configure allowed origins for web frontend access:
 ```yaml
 cors:
   whitelist:
-    - "https://your-frontend-domain.com"
-    - "https://localhost:3000"  # For development
+    - 'https://your-frontend-domain.com'
+    - 'https://localhost:3000' # For development
 ```
 
 ## First Run
@@ -138,13 +140,14 @@ curl -H "Authorization: Bearer hw_your_api_key_here" \
 - [Set up authentication](../authentication/) for secure access
 - Configure monitoring and logging
 - Set up your frontend application
-- Review the [API Reference](../api/) for available endpoints
+- Review the [API Reference](../../api/) for available endpoints
 
 ## Troubleshooting
 
 ### Service Won't Start
 
 Check the service logs:
+
 ```bash
 svcs -xv zoneweaver-agent
 tail -f /var/log/zoneweaver-agent/error.log
@@ -153,6 +156,7 @@ tail -f /var/log/zoneweaver-agent/error.log
 ### Permission Issues
 
 Ensure proper file permissions:
+
 ```bash
 chown -R zoneweaver:zoneweaver /var/lib/zoneweaver-agent
 chmod 600 /etc/zoneweaver-agent/config.yaml
@@ -161,5 +165,7 @@ chmod 600 /etc/zoneweaver-agent/config.yaml
 ### Network Connectivity
 
 Verify the service is listening on the correct ports:
+
 ```bash
 netstat -an | grep :5001
+```

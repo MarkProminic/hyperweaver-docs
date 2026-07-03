@@ -10,10 +10,8 @@ permalink: /zoneweaver-agent/changelog/
 
 {: .no_toc }
 
-Release history for the Zoneweaver Agent, loaded live from its GitHub releases.
+Release history for the Zoneweaver Agent.
 
 ---
 
-<div id="agent-changelog-content">
-  <p><em>Loading changelog...</em></p>
-</div>
+{% include changelogs/zoneweaver-agent.md %}

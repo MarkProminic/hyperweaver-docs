@@ -35,7 +35,7 @@ We encourage contributions of all types:
 - **Testing**: Bug reports, feature testing, compatibility testing
 - **Community support**: Helping others in discussions and issues
 
-See our [Contributing Guide](CONTRIBUTING.md) for details on how to get started.
+See our [Contributing Guide](/docs/contributing/) for details on how to get started.
 
 ## Recognition Policy
 
@@ -58,6 +58,6 @@ Special recognition for those who have helped the project in unique ways:
 
 ---
 
-**Want to see your name here?** Check out our [Contributing Guidelines](CONTRIBUTING.md) and start contributing!
+**Want to see your name here?** Check out our [Contributing Guidelines](/docs/contributing/) and start contributing!
 
 Remember: Due to limited development resources, community contributions directly impact the project's growth and feature development pace.

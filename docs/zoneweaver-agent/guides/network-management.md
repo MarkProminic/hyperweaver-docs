@@ -7,16 +7,18 @@ permalink: /zoneweaver-agent/guides/network-management/
 ---
 
 # Network Management Guide
+
 {: .no_toc }
 
 Comprehensive guide to managing network infrastructure for zones in zoneweaver-agent.
 {: .fs-6 .fw-300 }
 
 ## Table of contents
+
 {: .no_toc .text-delta }
 
 1. TOC
-{:toc}
+   {:toc}
 
 ---
 
@@ -24,7 +26,7 @@ Comprehensive guide to managing network infrastructure for zones in zoneweaver-a
 
 Zoneweaver-api provides comprehensive network management capabilities to support zone networking, including:
 
-- **Etherstubs & VNICs** — Virtual network infrastructure (already documented in [VNIC Management](vnics.md))
+- **Etherstubs & VNICs** — Virtual network infrastructure
 - **NAT & IP Forwarding** — Network Address Translation and routing for zone internet access
 - **DHCP Server** — Automatic IP assignment for zones on provisioning networks
 - **Provisioning Network** — Dedicated isolated network for zone setup and configuration
@@ -115,22 +117,24 @@ Traffic Flow:
 **Network Address Translation (NAT)** allows zones on private networks (e.g., 10.190.190.0/24) to access external networks using the host's public IP.
 
 **When to use NAT:**
+
 - Zones need internet access for package downloads
 - Multiple zones share one public IP
 - Zones are on isolated etherstubs without direct routing
 
 **OmniOS NAT implementation:**
+
 - Uses **ipfilter** (`/etc/ipf/ipnat.conf`)
 - Managed via **ipnat** command
 - Service: `svc:/network/ipfilter:default`
 
 ### NAT Rule Types
 
-| Type | Purpose | Example |
-|------|---------|---------|
-| `map` (portmap) | NAT with automatic port mapping | `map igb0 10.190.190.0/24 -> 0/32 portmap tcp/udp auto` |
-| `bimap` | Bidirectional NAT (1:1 mapping) | `bimap igb0 10.190.190.10 -> 192.168.1.100` |
-| `rdr` | Port redirection (port forwarding) | `rdr igb0 192.168.1.10 port 8080 -> 10.190.190.10 port 80` |
+| Type            | Purpose                            | Example                                                    |
+| --------------- | ---------------------------------- | ---------------------------------------------------------- |
+| `map` (portmap) | NAT with automatic port mapping    | `map igb0 10.190.190.0/24 -> 0/32 portmap tcp/udp auto`    |
+| `bimap`         | Bidirectional NAT (1:1 mapping)    | `bimap igb0 10.190.190.10 -> 192.168.1.100`                |
+| `rdr`           | Port redirection (port forwarding) | `rdr igb0 192.168.1.10 port 8080 -> 10.190.190.10 port 80` |
 
 **Most common for provisioning:** `map` with portmap auto.
 
@@ -142,6 +146,7 @@ curl -s https://hv-04-backend.home.m4kr.net:5001/network/nat/rules \
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -175,6 +180,7 @@ curl -s -X POST https://hv-04-backend.home.m4kr.net:5001/network/nat/rules \
 ```
 
 **Parameters:**
+
 - `bridge` (required) — Physical interface (e.g., `igb0`, `e1000g0`)
 - `subnet` (required) — Private subnet to NAT (e.g., `10.190.190.0/24`)
 - `target` (optional) — Target address (default: `0/32` = any)
@@ -182,6 +188,7 @@ curl -s -X POST https://hv-04-backend.home.m4kr.net:5001/network/nat/rules \
 - `type` (optional) — NAT type (default: `portmap`)
 
 **What happens:**
+
 1. Rule appended to `/etc/ipf/ipnat.conf`
 2. ipfilter service refreshed
 3. NAT immediately active
@@ -209,6 +216,7 @@ curl -s https://hv-04-backend.home.m4kr.net:5001/network/forwarding \
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -239,10 +247,12 @@ curl -s -X PUT https://hv-04-backend.home.m4kr.net:5001/network/forwarding \
 ```
 
 **Parameters:**
+
 - `enabled` (optional) — Global IPv4 forwarding (true/false)
 - `interfaces` (optional) — Array of interface names to enable forwarding on
 
 **What happens:**
+
 1. Global: `pfexec routeadm -u -e ipv4-forwarding`
 2. Per-interface: `pfexec ipadm set-ifprop -p forwarding=on -m ipv4 {iface}`
 3. Changes take effect immediately
@@ -256,12 +266,14 @@ curl -s -X PUT https://hv-04-backend.home.m4kr.net:5001/network/forwarding \
 **Dynamic Host Configuration Protocol (DHCP)** automatically assigns IP addresses to zones when they boot.
 
 **Why use DHCP for zones:**
+
 - No manual network configuration inside zones
 - Centralized IP management on host
 - Static MAC→IP mappings for predictable addressing
 - Works with zlogin automation (recipes don't need to know the IP in advance)
 
 **OmniOS DHCP implementation:**
+
 - Uses **isc-dhcp-server** (dhcpd)
 - Config: `/etc/dhcpd.conf`
 - Service: `svc:/network/dhcp/server:ipv4`
@@ -276,6 +288,7 @@ curl -s https://hv-04-backend.home.m4kr.net:5001/network/dhcp/config \
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -311,6 +324,7 @@ curl -s -X PUT https://hv-04-backend.home.m4kr.net:5001/network/dhcp/config \
 ```
 
 **Parameters:**
+
 - `subnet` (required) — Network address (e.g., `10.190.190.0`)
 - `netmask` (required) — Subnet mask (e.g., `255.255.255.0`)
 - `router` (required) — Default gateway for DHCP clients (e.g., `10.190.190.1`)
@@ -320,6 +334,7 @@ curl -s -X PUT https://hv-04-backend.home.m4kr.net:5001/network/dhcp/config \
 - `listen_interface` (optional) — VNIC to listen on
 
 **What happens:**
+
 1. Current `/etc/dhcpd.conf` read to preserve host entries
 2. New subnet config written
 3. Host entries appended back
@@ -338,6 +353,7 @@ curl -s https://hv-04-backend.home.m4kr.net:5001/network/dhcp/hosts \
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -371,11 +387,13 @@ curl -s -X POST https://hv-04-backend.home.m4kr.net:5001/network/dhcp/hosts \
 ```
 
 **Parameters:**
+
 - `hostname` (required) — Unique hostname identifier
 - `mac` (required) — MAC address (format: `xx:xx:xx:xx:xx:xx`)
 - `ip` (required) — Fixed IP address (must be within subnet)
 
 **What happens:**
+
 1. Check for duplicate hostname
 2. Append host block to `/etc/dhcpd.conf`:
    ```
@@ -403,6 +421,7 @@ curl -s https://hv-04-backend.home.m4kr.net:5001/network/dhcp/status \
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -422,6 +441,7 @@ curl -s -X PUT https://hv-04-backend.home.m4kr.net:5001/network/dhcp/status \
 ```
 
 **Actions:**
+
 - `start` — Enable DHCP service
 - `stop` — Disable DHCP service
 - `refresh` — Reload configuration
@@ -461,6 +481,7 @@ curl -s -X POST https://hv-04-backend.home.m4kr.net:5001/provisioning/network/se
 7. **Configure DHCP** — Subnet config + start service (if not configured)
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -485,6 +506,7 @@ curl -s https://hv-04-backend.home.m4kr.net:5001/provisioning/network/status \
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -524,6 +546,7 @@ curl -s -X DELETE https://hv-04-backend.home.m4kr.net:5001/provisioning/network/
 ```
 
 **What happens:**
+
 1. Stop DHCP service
 2. Remove NAT rule
 3. Delete host VNIC IP address
@@ -542,15 +565,16 @@ Provisioning network settings are defined in `config.yaml`:
 provisioning:
   network:
     enabled: true
-    etherstub_name: "estub_provision"
-    host_vnic_name: "provision_interconnect0"
-    subnet: "10.190.190.0/24"
-    host_ip: "10.190.190.1"
-    dhcp_range_start: "10.190.190.10"
-    dhcp_range_end: "10.190.190.254"
+    etherstub_name: 'estub_provision'
+    host_vnic_name: 'provision_interconnect0'
+    subnet: '10.190.190.0/24'
+    host_ip: '10.190.190.1'
+    dhcp_range_start: '10.190.190.10'
+    dhcp_range_end: '10.190.190.254'
 ```
 
 **Customization:**
+
 - Change `subnet` if `10.190.190.0/24` conflicts with existing networks
 - Adjust `dhcp_range_start`/`dhcp_range_end` to reserve static IPs
 - Modify `etherstub_name` and `host_vnic_name` if needed (must update zones too)
@@ -599,19 +623,23 @@ The zone's VNIC will auto-create on the etherstub. When zone boots, DHCP assigns
 **Symptom:** Zones can't reach internet despite NAT rule configured.
 
 **Check:**
+
 1. Verify NAT rule exists:
+
    ```bash
    curl -s https://hv-04-backend.home.m4kr.net:5001/network/nat/rules \
      -H "Authorization: Bearer {api_key}"
    ```
 
 2. Verify IP forwarding enabled:
+
    ```bash
    curl -s https://hv-04-backend.home.m4kr.net:5001/network/forwarding \
      -H "Authorization: Bearer {api_key}"
    ```
 
 3. Check ipfilter service:
+
    ```bash
    # On host
    pfexec svcs network/ipfilter
@@ -619,6 +647,7 @@ The zone's VNIC will auto-create on the etherstub. When zone boots, DHCP assigns
    ```
 
 4. Verify NAT rule in config:
+
    ```bash
    # On host
    cat /etc/ipf/ipnat.conf
@@ -632,6 +661,7 @@ The zone's VNIC will auto-create on the etherstub. When zone boots, DHCP assigns
    ```
 
 **Fix:**
+
 ```bash
 # Manually refresh ipfilter
 pfexec svcadm refresh network/ipfilter
@@ -644,19 +674,23 @@ pfexec svcadm enable network/ipfilter
 **Symptom:** Zone boots but doesn't get an IP via DHCP.
 
 **Check:**
+
 1. Verify DHCP service running:
+
    ```bash
    curl -s https://hv-04-backend.home.m4kr.net:5001/network/dhcp/status \
      -H "Authorization: Bearer {api_key}"
    ```
 
 2. Check DHCP config:
+
    ```bash
    # On host
    cat /etc/dhcpd.conf
    ```
 
 3. Verify listen interface:
+
    ```bash
    # On host
    pfexec svccfg -s dhcp/server:ipv4 listprop config/listen_ifnames
@@ -664,6 +698,7 @@ pfexec svcadm enable network/ipfilter
    ```
 
 4. Check DHCP logs:
+
    ```bash
    # On host
    tail -f /var/log/dhcpd.log
@@ -677,6 +712,7 @@ pfexec svcadm enable network/ipfilter
    ```
 
 **Fix:**
+
 ```bash
 # Restart DHCP service
 curl -s -X PUT https://hv-04-backend.home.m4kr.net:5001/network/dhcp/status \
@@ -690,12 +726,14 @@ curl -s -X PUT https://hv-04-backend.home.m4kr.net:5001/network/dhcp/status \
 **Symptom:** `POST /provisioning/network/setup` returns errors.
 
 **Common causes:**
+
 1. **Etherstub name conflict** — Another etherstub with same name exists
 2. **IP conflict** — `10.190.190.1` already assigned elsewhere
 3. **DHCP already running** — Another DHCP server on same interface
 4. **Permission issues** — API running without pfexec privileges
 
 **Check system state:**
+
 ```bash
 # List etherstubs
 dladm show-etherstub
@@ -711,6 +749,7 @@ svcs dhcp/server:ipv4
 ```
 
 **Fix:**
+
 - If components partially exist, run teardown then setup again:
   ```bash
   curl -s -X DELETE https://hv-04-backend.home.m4kr.net:5001/provisioning/network/teardown \
@@ -727,7 +766,9 @@ svcs dhcp/server:ipv4
 **Cause:** Firewall or routing issue.
 
 **Check:**
+
 1. Test connectivity from zone:
+
    ```bash
    # Inside zone
    ping 10.190.190.1  # Host's provisioning IP
@@ -735,6 +776,7 @@ svcs dhcp/server:ipv4
    ```
 
 2. Check host firewall (if ipfilter used for filtering, not just NAT):
+
    ```bash
    # On host
    pfexec ipfstat -io
@@ -747,6 +789,7 @@ svcs dhcp/server:ipv4
    ```
 
 **Fix:**
+
 - If zoneweaver-agent needs to be accessible from zones, ensure it binds to `0.0.0.0` or `10.190.190.1`, not just `127.0.0.1`
 - Add ipfilter pass rules if packet filtering is enabled (separate from NAT)
 
@@ -794,6 +837,7 @@ svcs dhcp/server:ipv4
 For complex environments (e.g., tenant isolation), create multiple provisioning networks:
 
 1. Create additional etherstubs:
+
    ```bash
    curl -s -X POST https://hv-04-backend.home.m4kr.net:5001/network/etherstubs \
      -H "Content-Type: application/json" \
@@ -802,6 +846,7 @@ For complex environments (e.g., tenant isolation), create multiple provisioning 
    ```
 
 2. Create host VNICs with different subnets:
+
    ```bash
    # 10.190.191.0/24 for tenant 2
    ```
@@ -862,45 +907,44 @@ pfexec snoop -d provision_interconnect0 port 67 or port 68
 
 ### NAT & Forwarding
 
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/network/nat/rules` | GET | List NAT rules |
-| `/network/nat/rules` | POST | Create NAT rule |
-| `/network/nat/rules/:ruleId` | DELETE | Delete NAT rule |
-| `/network/nat/status` | GET | ipfilter service status |
-| `/network/forwarding` | GET | IP forwarding status |
-| `/network/forwarding` | PUT | Configure IP forwarding |
+| Endpoint                     | Method | Purpose                 |
+| ---------------------------- | ------ | ----------------------- |
+| `/network/nat/rules`         | GET    | List NAT rules          |
+| `/network/nat/rules`         | POST   | Create NAT rule         |
+| `/network/nat/rules/:ruleId` | DELETE | Delete NAT rule         |
+| `/network/nat/status`        | GET    | ipfilter service status |
+| `/network/forwarding`        | GET    | IP forwarding status    |
+| `/network/forwarding`        | PUT    | Configure IP forwarding |
 
 ### DHCP
 
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/network/dhcp/config` | GET | Get DHCP configuration |
-| `/network/dhcp/config` | PUT | Update DHCP configuration |
-| `/network/dhcp/hosts` | GET | List static host entries |
-| `/network/dhcp/hosts` | POST | Add host entry |
-| `/network/dhcp/hosts/:hostname` | DELETE | Remove host entry |
-| `/network/dhcp/status` | GET | DHCP service status |
-| `/network/dhcp/status` | PUT | Control DHCP service |
+| Endpoint                        | Method | Purpose                   |
+| ------------------------------- | ------ | ------------------------- |
+| `/network/dhcp/config`          | GET    | Get DHCP configuration    |
+| `/network/dhcp/config`          | PUT    | Update DHCP configuration |
+| `/network/dhcp/hosts`           | GET    | List static host entries  |
+| `/network/dhcp/hosts`           | POST   | Add host entry            |
+| `/network/dhcp/hosts/:hostname` | DELETE | Remove host entry         |
+| `/network/dhcp/status`          | GET    | DHCP service status       |
+| `/network/dhcp/status`          | PUT    | Control DHCP service      |
 
 ### Provisioning Network
 
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/provisioning/network/status` | GET | Check provisioning network |
-| `/provisioning/network/setup` | POST | Setup provisioning network |
+| Endpoint                         | Method | Purpose                     |
+| -------------------------------- | ------ | --------------------------- |
+| `/provisioning/network/status`   | GET    | Check provisioning network  |
+| `/provisioning/network/setup`    | POST   | Setup provisioning network  |
 | `/provisioning/network/teardown` | DELETE | Remove provisioning network |
 
-For detailed API schemas and examples, see the [API Documentation](../api/index.md) and Swagger UI at `/api-docs`.
+For detailed API schemas and examples, see the [API Documentation](../../api/) and Swagger UI on a running agent.
 
 ---
 
 ## Related Documentation
 
-- [Provisioning Pipeline Guide](provisioning.md) — Complete provisioning workflow
-- [VNIC Management](vnics.md) — Creating and managing VNICs
-- [Zone Management](zone-management.md) — Zone creation, lifecycle, and provisioning
-- [Configuration Reference](../configuration.md) — Network and provisioning settings
+- [Provisioning Pipeline Guide](../provisioning/) — Complete provisioning workflow
+- [Zone Management](../zone-management/) — Zone creation, lifecycle, and provisioning
+- [Configuration Reference](../../configuration/) — Network and provisioning settings
 
 ---
 

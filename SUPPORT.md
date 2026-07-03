@@ -57,7 +57,7 @@ The Zoneweaver Agent community is encouraged to:
 - Installation and configuration problems
 - API usage questions
 - Bug reports with reproducible steps
-- Security concerns (see [SECURITY.md](SECURITY.md))
+- Security concerns (see [SECURITY.md](/docs/security/))
 - Feature requests (evaluated for feasibility)
 
 **Documentation:**
@@ -117,7 +117,7 @@ The best way to improve support for everyone:
 - **Help answer questions** from other users
 - **Report issues** you encounter
 
-See our [Contributing Guide](CONTRIBUTING.md) for more information.
+See our [Contributing Guide](/docs/contributing/) for more information.
 
 ## Alternative Resources
 

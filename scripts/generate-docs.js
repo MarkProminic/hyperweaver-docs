@@ -421,13 +421,48 @@ const writeSwaggerShell = ({ dir, title, permalink, specUrl }) => {
   console.log(`✅ ${path.relative(process.cwd(), path.join(dir, 'swagger-ui.html'))}`);
 };
 
+// Each component's CHANGELOG.md is pulled from its repo at BUILD time and rendered by
+// Jekyll on the changelog pages (via {% include %}). Changelogs only change on releases
+// and the docs rebuild then anyway, so a build-time pull is fine — and Jekyll renders the
+// markdown far better than a client-side parser could. A fetch failure writes a
+// placeholder so the build never breaks.
+const CHANGELOGS = [
+  {
+    url: 'https://raw.githubusercontent.com/Makr91/hyperweaver-server/refs/heads/main/CHANGELOG.md',
+    out: 'changelogs/hyperweaver-server.md',
+  },
+  {
+    url: 'https://raw.githubusercontent.com/Makr91/zoneweaver-agent/refs/heads/main/CHANGELOG.md',
+    out: 'changelogs/zoneweaver-agent.md',
+  },
+];
+
+const fetchChangelog = async ({ url, out }) => {
+  const outPath = path.join(process.cwd(), out);
+  fs.mkdirSync(path.dirname(outPath), { recursive: true });
+  let body;
+  try {
+    const resp = await fetch(url);
+    if (!resp.ok) {
+      throw new Error(`HTTP ${resp.status}`);
+    }
+    body = await resp.text();
+    console.log(`✅ ${out} (fetched)`);
+  } catch (err) {
+    body = `> Changelog is currently unavailable (${err.message}). See the project's GitHub releases.\n`;
+    console.warn(`⚠️  ${out}: ${err.message} — wrote placeholder`);
+  }
+  // raw guard: the changelog is external markdown (arbitrary commit-message text);
+  // stop Liquid (strict mode) from trying to interpret any {{ }} / {% %} inside it.
+  fs.writeFileSync(outPath, `{% raw %}\n${body}\n{% endraw %}\n`);
+};
+
 /**
- * Generate the Swagger UI shells for every documented component. Specs are fetched
- * live by the browser (see writeSwaggerShell) — this build bakes no spec, so it has
- * no dependency on any backend's source.
+ * Generate the docs build assets: Swagger UI shells (specs fetched live in the browser)
+ * plus the component changelogs (fetched at build, rendered by Jekyll).
  */
-const generateDocs = () => {
-  console.log('🔧 Generating Swagger UI shells (specs fetched live at runtime)...');
+const generateDocs = async () => {
+  console.log('🔧 Generating docs assets...');
   try {
     writeSwaggerShell({
       dir: path.join(process.cwd(), 'docs', 'api'),
@@ -441,11 +476,15 @@ const generateDocs = () => {
       permalink: '/zoneweaver-agent/api/swagger-ui.html',
       specUrl: AGENT_SPEC_URL,
     });
-    console.log('🎉 Swagger UI shells generated.');
+    await Promise.all(CHANGELOGS.map(c => fetchChangelog(c)));
+    console.log('🎉 Docs assets generated.');
   } catch (error) {
     console.error('❌ Error generating documentation:', error.message);
     process.exit(1);
   }
 };
 
-generateDocs();
+generateDocs().catch(error => {
+  console.error('❌ Error generating documentation:', error.message);
+  process.exit(1);
+});

@@ -7,21 +7,24 @@ permalink: /zoneweaver-agent/guides/production-installation/
 ---
 
 # Production Installation
+
 {: .no_toc }
 
 Complete guide for installing Zoneweaver Agent in production using the OmniOS package.
 
 ## Table of contents
+
 {: .no_toc .text-delta }
 
 1. TOC
-{:toc}
+   {:toc}
 
 ---
 
 ## System Requirements
 
 ### OmniOS Host Requirements
+
 - **Operating System**: OmniOS (Latest stable release recommended)
 - **Architecture**: x86_64
 - **Memory**: Minimum 512MB RAM, 2GB+ recommended for production workloads
@@ -29,7 +32,9 @@ Complete guide for installing Zoneweaver Agent in production using the OmniOS pa
 - **Network**: HTTP/HTTPS connectivity for package installation and API access
 
 ### Dependencies
+
 The following packages are automatically installed as dependencies:
+
 - **Node.js**: `ooce/runtime/node-22`
 - **SQLite**: `database/sqlite-3`
 - **GCC 14**: `developer/gcc-14` (for bcrypt native module compilation)
@@ -60,6 +65,7 @@ pfexec pkg install system/virtualization/zoneweaver-agent
 ```
 
 The installation will:
+
 - Create the `zwagent` system user and group
 - Install application files to `/opt/zoneweaver-agent`
 - Set up configuration directory at `/etc/zoneweaver-agent`
@@ -77,6 +83,7 @@ svcs application/zoneweaver-agent
 ```
 
 Expected output:
+
 ```
 STATE          STIME    FMRI
 online         12:34:56 svc:/application/zoneweaver-agent:default
@@ -96,12 +103,12 @@ server:
   https_port: 5001
 
 ssl:
-  key_path: "/etc/zoneweaver-agent/ssl/server.key"
-  cert_path: "/etc/zoneweaver-agent/ssl/server.crt"
+  key_path: '/etc/zoneweaver-agent/ssl/server.key'
+  cert_path: '/etc/zoneweaver-agent/ssl/server.crt'
 
 database:
-  dialect: "sqlite"
-  storage: "/var/lib/zoneweaver-agent/database/database.sqlite"
+  dialect: 'sqlite'
+  storage: '/var/lib/zoneweaver-agent/database/database.sqlite'
 
 api_keys:
   bootstrap_enabled: true
@@ -111,10 +118,12 @@ api_keys:
 ### SSL Certificates
 
 **SSL certificates are automatically generated on first startup** if they don't exist:
+
 - **Private Key**: `/etc/zoneweaver-agent/ssl/server.key`
 - **Certificate**: `/etc/zoneweaver-agent/ssl/server.crt`
 
 **Optional: Custom SSL certificates** (only needed if you want to use your own certificates):
+
 ```bash
 # Copy your certificates
 pfexec cp your-server.key /etc/zoneweaver-agent/ssl/server.key
@@ -146,6 +155,7 @@ curl -X POST http://localhost:5000/api-keys/bootstrap \
 ```
 
 Example response:
+
 ```json
 {
   "api_key": "hw_1234567890abcdef...",
@@ -165,7 +175,7 @@ Verify the API is working:
 curl -H "Authorization: Bearer hw_your_api_key_here" \
      http://localhost:5000/api/entities
 
-# Test HTTPS endpoint  
+# Test HTTPS endpoint
 curl -k -H "Authorization: Bearer hw_your_api_key_here" \
      https://localhost:5001/api/entities
 ```
@@ -173,6 +183,7 @@ curl -k -H "Authorization: Bearer hw_your_api_key_here" \
 ### 3. Access API Documentation
 
 The interactive Swagger documentation is available at:
+
 - **HTTPS**: https://localhost:5001/api-docs (Recommended)
 - **HTTP**: http://localhost:5000/api-docs
 
@@ -235,8 +246,8 @@ Edit `/etc/zoneweaver-agent/config.yaml`:
 ```yaml
 cors:
   whitelist:
-    - "https://your-zoneweaver-frontend.domain.com"
-    - "https://your-management-interface.domain.com"
+    - 'https://your-zoneweaver-frontend.domain.com'
+    - 'https://your-management-interface.domain.com'
 ```
 
 ### Firewall Configuration
@@ -263,6 +274,7 @@ pfexec pkg update system/virtualization/zoneweaver-agent
 ```
 
 Package updates automatically:
+
 - Preserve configuration files
 - Restart the service
 - Maintain database integrity
@@ -294,11 +306,13 @@ grep zoneweaver-agent /etc/logadm.conf
 ### Service Won't Start
 
 1. **Check service status**:
+
    ```bash
    svcs -xv application/zoneweaver-agent
    ```
 
 2. **Check SMF logs**:
+
    ```bash
    tail -f /var/svc/log/application-zoneweaver-agent:default.log
    ```
@@ -311,6 +325,7 @@ grep zoneweaver-agent /etc/logadm.conf
 ### Common Issues
 
 #### SSL Certificate Problems
+
 ```bash
 # Check certificate files
 ls -la /etc/zoneweaver-agent/ssl/
@@ -321,6 +336,7 @@ pfexec svcadm restart application/zoneweaver-agent
 ```
 
 #### Database Permission Issues
+
 ```bash
 # Fix database directory permissions
 pfexec chown -R zwagent:zwagent /var/lib/zoneweaver-agent
@@ -329,6 +345,7 @@ pfexec svcadm restart application/zoneweaver-agent
 ```
 
 #### Configuration Issues
+
 ```bash
 # Validate configuration syntax
 pfexec -u zwagent /opt/zoneweaver-agent/node_modules/.bin/node -c /etc/zoneweaver-agent/config.yaml
@@ -338,7 +355,7 @@ pfexec -u zwagent /opt/zoneweaver-agent/node_modules/.bin/node -c /etc/zoneweave
 
 - **GitHub Issues**: [https://github.com/Makr91/zoneweaver-agent/issues](https://github.com/Makr91/zoneweaver-agent/issues)
 - **API Documentation**: Available at your server's `/api-docs` endpoint
-- **Configuration Reference**: [Configuration Guide](../reference/configuration/)
+- **Configuration Reference**: [Configuration Guide](../../configuration/)
 
 ---
 
@@ -357,3 +374,4 @@ pfexec pkg uninstall system/virtualization/zoneweaver-agent
 pfexec rm -rf /var/lib/zoneweaver-agent
 pfexec rm -rf /var/log/zoneweaver-agent
 pfexec rm -rf /etc/zoneweaver-agent
+```

@@ -72,7 +72,7 @@ Configuration file location:
 - **Package install**: `/etc/hyperweaver-server/config.yaml`
 - **Source install**: `./config.yaml`
 
-See the [Configuration Reference](../configuration/) for all options. The minimum useful settings are the server port/SSL, `authentication.jwt_secret`, and `database.storage`.
+See the [Configuration Reference](../../configuration/) for all options. The minimum useful settings are the server port/SSL, `authentication.jwt_secret`, and `database.storage`.
 
 ### SSL Certificates
 
@@ -139,7 +139,7 @@ When running behind a proxy, set `frontend.trust_proxy` in the config to the num
 
 1. Open `https://your-server:3443` and register the first (super-admin) user
 2. Harden: set `authentication.local_allow_new_organizations: false` after setup, and use a strong `jwt_secret`
-3. Add your Zoneweaver Agent(s) — see [Backend Integration](backend-integration/)
+3. Add your Zoneweaver Agent(s) — see [Backend Integration](../backend-integration/)
 
 ### Updates
 
@@ -170,4 +170,4 @@ ls -la /etc/hyperweaver-server/ssl/
 
 ---
 
-Next: [Authentication](authentication/) — set up user management
+Next: [Authentication](../authentication/) — set up user management

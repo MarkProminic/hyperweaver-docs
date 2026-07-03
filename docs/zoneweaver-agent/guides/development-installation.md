@@ -7,21 +7,24 @@ permalink: /zoneweaver-agent/guides/development-installation/
 ---
 
 # Development Installation
+
 {: .no_toc }
 
 Complete guide for setting up Zoneweaver Agent for development and testing.
 
 ## Table of contents
+
 {: .no_toc .text-delta }
 
 1. TOC
-{:toc}
+   {:toc}
 
 ---
 
 ## System Requirements
 
 ### OmniOS Development Environment
+
 - **Operating System**: OmniOS (Latest stable release)
 - **Node.js**: Version 16 or higher
 - **Git**: For cloning the repository
@@ -30,6 +33,7 @@ Complete guide for setting up Zoneweaver Agent for development and testing.
 - **Storage**: 2GB+ free space (includes dependencies and development tools)
 
 ### Development Tools
+
 - **Code Editor**: VS Code, Vim, or your preferred editor
 - **API Testing**: curl, Postman, or similar tools
 - **Database Tools**: SQLite CLI (optional)
@@ -83,35 +87,36 @@ vi config/config.dev.yaml
 ```
 
 Example development configuration:
+
 ```yaml
 server:
   http_port: 5000
   https_port: 5001
 
 ssl:
-  key_path: "./ssl/dev-server.key"
-  cert_path: "./ssl/dev-server.crt"
+  key_path: './ssl/dev-server.key'
+  cert_path: './ssl/dev-server.crt'
 
 database:
-  dialect: "sqlite"
-  storage: "./dev-database.sqlite"
-  logging: true  # Enable SQL query logging in development
+  dialect: 'sqlite'
+  storage: './dev-database.sqlite'
+  logging: true # Enable SQL query logging in development
 
 api_keys:
   bootstrap_enabled: true
-  bootstrap_auto_disable: false  # Keep bootstrap enabled for testing
+  bootstrap_auto_disable: false # Keep bootstrap enabled for testing
   key_length: 64
-  hash_rounds: 10  # Lower hash rounds for faster development
+  hash_rounds: 10 # Lower hash rounds for faster development
 
 cors:
   whitelist:
-    - "http://localhost:3000"   # Zoneweaverfrontend dev server
-    - "https://localhost:3001"  # Zoneweaverfrontend dev HTTPS
-    - "http://localhost:8080"   # Alternative dev server
-    - "*"  # Allow all origins in development (NOT for production!)
+    - 'http://localhost:3000' # Zoneweaverfrontend dev server
+    - 'https://localhost:3001' # Zoneweaverfrontend dev HTTPS
+    - 'http://localhost:8080' # Alternative dev server
+    - '*' # Allow all origins in development (NOT for production!)
 
 stats:
-  public_access: true  # Allow public access to stats in development
+  public_access: true # Allow public access to stats in development
 ```
 
 ### 5. Generate Development SSL Certificates
@@ -146,6 +151,7 @@ NODE_ENV=development CONFIG_PATH=./config/config.dev.yaml npm start
 ```
 
 Expected output:
+
 ```
 🚀 Zoneweaver Agent Server starting...
 📊 Database connection established (SQLite: ./dev-database.sqlite)
@@ -224,9 +230,11 @@ The project includes several npm scripts for development:
 ### Database Development
 
 #### SQLite Database Location
+
 Development database: `./dev-database.sqlite`
 
 #### Database Operations
+
 ```bash
 # View database contents
 sqlite3 dev-database.sqlite ".tables"
@@ -260,12 +268,14 @@ curl http://localhost:5000/api-docs/openapi.json
 ### Interactive API Documentation
 
 Access the Swagger UI at:
+
 - **HTTP**: http://localhost:5000/api-docs
 - **HTTPS**: https://localhost:5001/api-docs (accept self-signed certificate)
 
 ### Development API Features
 
 Development mode includes:
+
 - **Bootstrap endpoint** remains enabled
 - **CORS** allows all origins (`*`)
 - **SQL logging** enabled for debugging
@@ -304,13 +314,13 @@ zoneweaver-agent/
 ```javascript
 // controllers/ExampleController.js
 class ExampleController {
-    static async getExample(req, res) {
-        try {
-            res.json({ message: 'Hello from Zoneweaver Agent!' });
-        } catch (error) {
-            res.status(500).json({ msg: error.message });
-        }
+  static async getExample(req, res) {
+    try {
+      res.json({ message: 'Hello from Zoneweaver Agent!' });
+    } catch (error) {
+      res.status(500).json({ msg: error.message });
     }
+  }
 }
 
 // routes/index.js (add route)
@@ -360,12 +370,15 @@ sqlite3 dev-database.sqlite ".log stdout" ".timer on"
 ## Development Tips
 
 ### Hot Reload Setup
+
 Nodemon is configured to watch for changes in:
+
 - `.js` files
-- `.json` files  
+- `.json` files
 - `config/*.yaml` files
 
 ### Git Workflow
+
 ```bash
 # Create feature branch
 git checkout -b feature/your-feature
@@ -379,6 +392,7 @@ git push origin feature/your-feature
 ```
 
 ### Code Style
+
 - Use **ESLint** for code linting
 - Use **Prettier** for code formatting
 - Follow **Node.js best practices**
@@ -401,6 +415,7 @@ node --inspect index.js  # Chrome DevTools debugging
 ### Common Development Issues
 
 #### Port Already in Use
+
 ```bash
 # Find process using port 5000
 lsof -i :5000
@@ -409,6 +424,7 @@ kill -9 <PID>
 ```
 
 #### Database Locked
+
 ```bash
 # Remove database lock (stops all processes first)
 pkill -f "node.*index.js"
@@ -416,6 +432,7 @@ rm dev-database.sqlite-wal dev-database.sqlite-shm
 ```
 
 #### SSL Certificate Issues
+
 ```bash
 # Regenerate development certificates
 rm ssl/dev-server.*
@@ -423,6 +440,7 @@ openssl req -x509 -newkey rsa:2048 -keyout ssl/dev-server.key -out ssl/dev-serve
 ```
 
 #### Node.js Module Issues
+
 ```bash
 # Clear npm cache and reinstall
 rm -rf node_modules package-lock.json

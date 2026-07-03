@@ -8,15 +8,17 @@ permalink: /zoneweaver-agent/api/
 ---
 
 # API Reference
+
 {: .no_toc }
 
 The Zoneweaver Agent provides comprehensive RESTful endpoints for managing Bhyve virtual machines, networking, storage, and system monitoring on OmniOS/illumos systems.
 
 ## Table of contents
+
 {: .no_toc .text-delta }
 
 1. TOC
-{:toc}
+   {:toc}
 
 ---
 
@@ -51,6 +53,7 @@ The Zoneweaver Agent is fully documented using OpenAPI 3.0 specification.
 The Zoneweaver Agent is organized into the following categories:
 
 #### Zone Management
+
 - Zone lifecycle management (create, start, stop, delete, restart)
 - Zone configuration and properties
 - Zone modification (add/remove disks, NICs, CD-ROMs)
@@ -58,6 +61,7 @@ The Zoneweaver Agent is organized into the following categories:
 - **Zone provisioning pipeline** (automated configuration, file sync, provisioner execution)
 
 #### Network Management
+
 - VLAN configuration and management
 - VNIC (Virtual Network Interface) management
 - Etherstub management
@@ -67,35 +71,41 @@ The Zoneweaver Agent is organized into the following categories:
 - **Provisioning network setup** (isolated network for zone setup)
 
 #### Storage Management
+
 - ZFS dataset management
 - ZFS pool management and monitoring
 - Swap area management
 - Artifact management (provisioning file uploads)
 
 #### Console Access
+
 - VNC console sessions
 - Terminal/SSH sessions (zlogin)
 - **Zlogin automation** (recipe-based serial console automation)
 - WebSocket connections for real-time access
 
 #### Provisioning System
+
 - **Recipe management** (zlogin automation templates for OS-specific network setup)
 - **Provisioning profiles** (reusable provisioning configurations)
 - **Provisioning orchestration** (complete pipeline: extract → boot → setup → sync → execute)
 - **Tool installation** (automatic setup of rsync, ansible, dhcpd, git)
 
 #### System Monitoring
+
 - Host system metrics and statistics
 - Network usage and performance monitoring
 - Storage I/O and capacity monitoring
 - CPU and memory statistics
 
 #### Template Management
+
 - Vagrant box import from BoxVault registries
 - Template storage and versioning
 - ZFS clone strategies (thin clone vs full copy)
 
 #### API Management
+
 - API key generation and management
 - Bootstrap configuration
 - Entity management
@@ -117,6 +127,7 @@ The API uses standard HTTP status codes and returns JSON error responses:
 ```
 
 Common status codes:
+
 - `200` - Success
 - `201` - Created
 - `400` - Bad Request
@@ -128,12 +139,14 @@ Common status codes:
 ## Pagination
 
 Paginated endpoints support the following query parameters:
+
 - `limit` - Number of items per page (default: 50)
 - `offset` - Number of items to skip
 
 ## WebSocket Endpoints
 
 Real-time features use WebSocket connections:
+
 - `/term/{sessionId}` - Terminal sessions
 - `/zlogin/{sessionId}` - Zone login sessions
 - `/zones/{zoneName}/vnc/websockify` - VNC console access

@@ -23,7 +23,7 @@ Setting up user authentication, organizations, and security in Hyperweaver Serve
 
 ## Authentication Methods
 
-Hyperweaver Server supports three tiers (see the [Configuration Reference](../configuration/) for all fields):
+Hyperweaver Server supports three tiers (see the [Configuration Reference](../../configuration/) for all fields):
 
 - **Local** (default) — username/password → JWT session
 - **LDAP** — bind against a directory
@@ -108,4 +108,4 @@ curl https://your-server:3443/api/auth/profile \
 
 ---
 
-Next: [Backend Integration](backend-integration/) — connect to Zoneweaver Agents
+Next: [Backend Integration](../backend-integration/) — connect to Zoneweaver Agents

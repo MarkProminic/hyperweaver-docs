@@ -1,15 +1,9 @@
-<!-- Custom head content for Hyperweaver Server Documentation -->
-<link rel="icon" type="image/x-icon" href="{{ '/web/public/favicon.ico' | relative_url }}" />
-<link
-  rel="apple-touch-icon"
-  sizes="192x192"
-  href="{{ '/web/public/images/logo192.png' | relative_url }}"
-/>
-<link
-  rel="apple-touch-icon"
-  sizes="512x512"
-  href="{{ '/web/public/images/logo512.png' | relative_url }}"
-/>
+<!-- Custom head content for Hyperweaver Documentation.
+     Favicon/touch icons are served by the app at its root (outside this /docs site),
+     so they're absolute paths and html-proofer ignores them. -->
+<link rel="icon" type="image/x-icon" href="/favicon.ico" />
+<link rel="apple-touch-icon" sizes="192x192" href="/images/logo192.png" />
+<link rel="apple-touch-icon" sizes="512x512" href="/images/logo512.png" />
 
 <!-- Dynamic version loading for releases page -->
 <script type="text/javascript">
@@ -47,26 +41,8 @@
   });
 </script>
 
-<!-- Dynamic version loading for changelog page -->
-<script type="text/javascript">
-  document.addEventListener('DOMContentLoaded', function () {
-    if (window.location.pathname.includes('/changelog/')) {
-      var releaseDiv = document.getElementById('latest-release-content');
-      if (releaseDiv) {
-        fetch(
-          'https://raw.githubusercontent.com/Makr91/hyperweaver-server/refs/heads/main/package.json'
-        )
-          .then(function (response) {
-            return response.json();
-          })
-          .then(function (data) {
-            releaseDiv.innerHTML =
-              '<p><strong>Version v' + data.version + '</strong> - Current Build</p>';
-          });
-      }
-    }
-  });
-</script>
+<!-- Server + agent changelogs are rendered at build time (Jekyll include of each
+     repo's CHANGELOG.md, fetched by scripts/generate-docs.js), so no runtime loader here. -->
 
 <!-- Dynamic version loading for security page -->
 <script type="text/javascript">
@@ -139,51 +115,6 @@
                 data.version +
                 '.p5p';
             }
-          });
-      }
-    }
-  });
-</script>
-
-<!-- Dynamic changelog for the Zoneweaver Agent (renders its GitHub releases) -->
-<script type="text/javascript">
-  document.addEventListener('DOMContentLoaded', function () {
-    if (window.location.pathname.includes('/zoneweaver-agent/changelog/')) {
-      var el = document.getElementById('agent-changelog-content');
-      if (el) {
-        fetch('https://api.github.com/repos/Makr91/zoneweaver-agent/releases')
-          .then(function (response) {
-            return response.json();
-          })
-          .then(function (releases) {
-            if (!Array.isArray(releases) || releases.length === 0) {
-              el.innerHTML =
-                '<p><em>No releases published yet. See <a href="https://github.com/Makr91/zoneweaver-agent/releases">GitHub releases</a>.</em></p>';
-              return;
-            }
-            var esc = function (s) {
-              return String(s).replace(/[<>&]/g, function (c) {
-                return { '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c];
-              });
-            };
-            var html = '';
-            releases.forEach(function (rel) {
-              if (rel.draft) {
-                return;
-              }
-              var date = new Date(rel.published_at).toLocaleDateString();
-              html +=
-                '<h2>' + esc(rel.tag_name || rel.name) + ' <small>(' + date + ')</small></h2>';
-              html +=
-                '<pre style="white-space:pre-wrap">' +
-                (rel.body ? esc(rel.body) : 'No release notes.') +
-                '</pre>';
-            });
-            el.innerHTML = html;
-          })
-          .catch(function () {
-            el.innerHTML =
-              '<p><em>Error loading changelog. See <a href="https://github.com/Makr91/zoneweaver-agent/releases">GitHub releases</a>.</em></p>';
           });
       }
     }

@@ -22,10 +22,10 @@ Download the latest Zoneweaver Agent — the Bhyve/OmniOS host agent.
 
 ### Download Options
 
-| Package Type       | Platform | Download                                                                                                                                |
-| :----------------- | :------- | :------------------------------------------------------------------------------------------------------------------------------------- |
-| **OmniOS Package** | x86_64   | [📦 Download .p5p](https://github.com/Makr91/zoneweaver-agent/releases/latest/download/zoneweaver-agent.p5p){: .btn .btn-primary }      |
-| **Source Code**    | All      | [📁 Download Source](https://github.com/Makr91/zoneweaver-agent/archive/refs/heads/main.tar.gz){: .btn .btn-outline }                  |
+| Package Type       | Platform | Download                                                                                                                           |
+| :----------------- | :------- | :--------------------------------------------------------------------------------------------------------------------------------- |
+| **OmniOS Package** | x86_64   | [📦 Download .p5p](https://github.com/Makr91/zoneweaver-agent/releases/latest/download/zoneweaver-agent.p5p){: .btn .btn-primary } |
+| **Source Code**    | All      | [📁 Download Source](https://github.com/Makr91/zoneweaver-agent/archive/refs/heads/main.tar.gz){: .btn .btn-outline }              |
 
 ---
 

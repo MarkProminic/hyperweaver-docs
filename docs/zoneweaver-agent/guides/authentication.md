@@ -7,15 +7,17 @@ permalink: /zoneweaver-agent/guides/authentication/
 ---
 
 # Authentication Guide
+
 {: .no_toc }
 
 Learn how to set up and manage API keys for secure access to the Zoneweaver Agent.
 
 ## Table of contents
+
 {: .no_toc .text-delta }
 
 1. TOC
-{:toc}
+   {:toc}
 
 ---
 
@@ -26,6 +28,7 @@ The Zoneweaver Agent uses Bearer token authentication with API keys. All request
 ## API Key Format
 
 Zoneweaver Agent keys use the following format:
+
 ```
 hw_[random_string]
 ```
@@ -48,6 +51,7 @@ curl -X POST https://your-server:5001/api-keys/bootstrap \
 ```
 
 **Response:**
+
 ```json
 {
   "api_key": "hw_abc123def456...",
@@ -79,12 +83,12 @@ const apiKey = 'hw_your_api_key_here';
 
 fetch('https://your-server:5001/zones', {
   headers: {
-    'Authorization': `Bearer ${apiKey}`,
-    'Content-Type': 'application/json'
-  }
+    Authorization: `Bearer ${apiKey}`,
+    'Content-Type': 'application/json',
+  },
 })
-.then(response => response.json())
-.then(data => console.log(data));
+  .then(response => response.json())
+  .then(data => console.log(data));
 ```
 
 ## Managing API Keys
@@ -158,14 +162,16 @@ const apiKey = process.env.ZONEWEAVER_API_KEY;
 ### 2. Different Keys for Different Uses
 
 Create separate API keys for:
+
 - Frontend applications
-- Backend services  
+- Backend services
 - Development/testing
 - Administrative tasks
 
 ### 3. Regular Key Rotation
 
 Periodically regenerate API keys:
+
 1. Generate a new key
 2. Update applications to use the new key
 3. Delete or revoke the old key
@@ -187,13 +193,13 @@ Configure API key behavior in `/etc/zoneweaver-agent/config.yaml`:
 api_keys:
   # Enable/disable bootstrap endpoint
   bootstrap_enabled: true
-  
+
   # Auto-disable bootstrap after first use
   bootstrap_auto_disable: true
-  
+
   # API key length (characters after hw_ prefix)
   key_length: 32
-  
+
   # Bcrypt hash rounds for storing keys
   hash_rounds: 12
 ```
@@ -205,6 +211,7 @@ api_keys:
 **Error:** `401 Unauthorized - Invalid API key`
 
 **Solutions:**
+
 1. Verify the API key format includes `hw_` prefix
 2. Check that the key hasn't been revoked
 3. Ensure the Authorization header is properly formatted
@@ -215,6 +222,7 @@ api_keys:
 **Error:** `403 Forbidden - Bootstrap endpoint disabled`
 
 **Solutions:**
+
 1. Use an existing API key to generate new keys
 2. If no keys exist, manually enable bootstrap in config:
    ```yaml
@@ -228,5 +236,7 @@ api_keys:
 **Error:** `401 Unauthorized - API key required`
 
 **Solution:** Include the Authorization header in your request:
+
 ```bash
 -H "Authorization: Bearer hw_your_api_key"
+```

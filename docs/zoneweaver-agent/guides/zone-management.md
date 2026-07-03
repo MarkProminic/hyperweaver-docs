@@ -7,15 +7,17 @@ permalink: /zoneweaver-agent/guides/zone-management/
 ---
 
 # Zone Management
+
 {: .no_toc }
 
 Create, modify, and manage bhyve virtual machine zones through the API.
 
 ## Table of contents
+
 {: .no_toc .text-delta }
 
 1. TOC
-{:toc}
+   {:toc}
 
 ---
 
@@ -126,6 +128,7 @@ curl -X POST https://your-server:5001/zones \
 ```
 
 Clone strategies:
+
 - `clone` - Thin ZFS clone (instant, shares blocks with template)
 - `copy` - Full ZFS send/recv (independent copy, slower)
 
@@ -365,20 +368,20 @@ curl https://your-server:5001/tasks/TASK_ID \
 
 Creation tasks report granular progress:
 
-| Progress | Stage |
-|----------|-------|
-| 5% | Validating parameters |
-| 10% | Preparing storage (ZFS volumes) |
-| 30% | Importing template (if applicable) |
-| 40% | Applying zone configuration |
-| 50% | Configuring boot disk |
-| 60% | Configuring additional disks |
-| 70% | Configuring CD-ROMs |
-| 75% | Configuring network interfaces |
-| 80% | Configuring cloud-init |
-| 90% | Installing zone |
-| 95% | Creating database record |
-| 100% | Complete |
+| Progress | Stage                              |
+| -------- | ---------------------------------- |
+| 5%       | Validating parameters              |
+| 10%      | Preparing storage (ZFS volumes)    |
+| 30%      | Importing template (if applicable) |
+| 40%      | Applying zone configuration        |
+| 50%      | Configuring boot disk              |
+| 60%      | Configuring additional disks       |
+| 70%      | Configuring CD-ROMs                |
+| 75%      | Configuring network interfaces     |
+| 80%      | Configuring cloud-init             |
+| 90%      | Installing zone                    |
+| 95%      | Creating database record           |
+| 100%     | Complete                           |
 
 ---
 
@@ -415,6 +418,7 @@ If a zvol is already attached to another zone, the creation/modification task wi
 ### Rollback on Failure
 
 If zone creation fails at any stage, the system automatically rolls back:
+
 1. Removes the `zonecfg` configuration (if applied)
 2. Destroys any ZFS datasets that were created during the task (does not touch existing datasets)
 
@@ -424,30 +428,30 @@ If zone creation fails at any stage, the system automatically rolls back:
 
 ### Zone Attributes
 
-| Property | Type | Description | Example |
-|----------|------|-------------|---------|
-| `name` | string | Zone name (required) | `"web-server-01"` |
-| `brand` | string | Zone brand (required for creation) | `"bhyve"` |
-| `ram` | string | Memory allocation | `"2G"` |
-| `vcpus` | string | Virtual CPU count | `"2"` |
-| `bootrom` | string | Boot ROM firmware | `"BHYVE_RELEASE_CSM"` |
-| `hostbridge` | string | Host bridge emulation | `"i440fx"` |
-| `diskif` | string | Disk interface | `"virtio"` |
-| `netif` | string | Network interface type | `"virtio"` |
-| `os_type` | string | Guest OS type | `"generic"` |
-| `vnc` | string | VNC console | `"on"` |
-| `acpi` | string | ACPI support | `"on"` |
-| `xhci` | string | xHCI USB controller | `"on"` |
-| `autoboot` | boolean | Auto-boot on host startup | `false` |
+| Property     | Type    | Description                        | Example               |
+| ------------ | ------- | ---------------------------------- | --------------------- |
+| `name`       | string  | Zone name (required)               | `"web-server-01"`     |
+| `brand`      | string  | Zone brand (required for creation) | `"bhyve"`             |
+| `ram`        | string  | Memory allocation                  | `"2G"`                |
+| `vcpus`      | string  | Virtual CPU count                  | `"2"`                 |
+| `bootrom`    | string  | Boot ROM firmware                  | `"BHYVE_RELEASE_CSM"` |
+| `hostbridge` | string  | Host bridge emulation              | `"i440fx"`            |
+| `diskif`     | string  | Disk interface                     | `"virtio"`            |
+| `netif`      | string  | Network interface type             | `"virtio"`            |
+| `os_type`    | string  | Guest OS type                      | `"generic"`           |
+| `vnc`        | string  | VNC console                        | `"on"`                |
+| `acpi`       | string  | ACPI support                       | `"on"`                |
+| `xhci`       | string  | xHCI USB controller                | `"on"`                |
+| `autoboot`   | boolean | Auto-boot on host startup          | `false`               |
 
 ### Boot Volume Options
 
-| Option | Description |
-|--------|-------------|
+| Option             | Description                                              |
+| ------------------ | -------------------------------------------------------- |
 | `create_new: true` | Create a new ZFS volume with specified pool/dataset/size |
-| `existing_dataset` | Attach an existing ZFS dataset (zvol) |
-| From template | Clone or copy from a template dataset |
-| Omitted | No boot disk (diskless zone for PXE/netboot) |
+| `existing_dataset` | Attach an existing ZFS dataset (zvol)                    |
+| From template      | Clone or copy from a template dataset                    |
+| Omitted            | No boot disk (diskless zone for PXE/netboot)             |
 
 ---
 
@@ -457,7 +461,7 @@ If zone creation fails at any stage, the system automatically rolls back:
 
 After zone creation, you can run the **provisioning pipeline** to automatically configure networking, sync files, and execute provisioners (shell scripts, Ansible playbooks). This is the automated equivalent of manually logging into a zone and running setup commands.
 
-For comprehensive provisioning documentation, see the [Provisioning Pipeline Guide](provisioning.md).
+For comprehensive provisioning documentation, see the [Provisioning Pipeline Guide](../provisioning/).
 
 ### Provisioning Workflow
 
@@ -514,7 +518,8 @@ curl -X PUT https://your-server:5001/zones/web-server-01 \
 ```
 
 **Key fields:**
-- `recipe_id` — Zlogin automation recipe for network setup (see [Provisioning Guide](provisioning.md))
+
+- `recipe_id` — Zlogin automation recipe for network setup (see [Provisioning Guide](../provisioning/))
 - `mode` — Provisioner type: `shell`, `ansible`, `ansible_local`, or `none`
 - `artifact_id` — ID of uploaded provisioning artifact (tar.gz)
 - `credentials` — SSH credentials for zone access
@@ -531,6 +536,7 @@ curl -X POST https://your-server:5001/zones/web-server-01/provision \
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -554,16 +560,17 @@ curl -X POST https://your-server:5001/zones/web-server-01/provision \
 
 The pipeline executes these stages sequentially (each is a separate task with `depends_on` chaining):
 
-| Stage | Task Operation | Description |
-|-------|----------------|-------------|
-| 1. Extract | `zfs_create_dataset` + artifact extraction | Extract provisioning tar.gz to ZFS dataset |
-| 2. Boot | `zone_start` | Start the zone |
-| 3. Setup | `zone_setup` | Run zlogin recipe to configure network |
-| 4. Wait SSH | `zone_wait_ssh` | Poll until SSH is responsive |
-| 5. Sync | `zone_sync` | rsync files from host to zone |
-| 6. Provision | `zone_provision` | Execute provisioners (shell/ansible) |
+| Stage        | Task Operation                             | Description                                |
+| ------------ | ------------------------------------------ | ------------------------------------------ |
+| 1. Extract   | `zfs_create_dataset` + artifact extraction | Extract provisioning tar.gz to ZFS dataset |
+| 2. Boot      | `zone_start`                               | Start the zone                             |
+| 3. Setup     | `zone_setup`                               | Run zlogin recipe to configure network     |
+| 4. Wait SSH  | `zone_wait_ssh`                            | Poll until SSH is responsive               |
+| 5. Sync      | `zone_sync`                                | rsync files from host to zone              |
+| 6. Provision | `zone_provision`                           | Execute provisioners (shell/ansible)       |
 
 After completion, ZFS snapshots are created:
+
 - `@pre-provision` — Before running provisioners (rollback point)
 - `@post-provision` — After successful provisioning (known-good state)
 
@@ -575,6 +582,7 @@ curl https://your-server:5001/zones/web-server-01/provision/status \
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -618,26 +626,29 @@ This rolls back the provisioning ZFS dataset to `@pre-provision`, removing all p
 ### Provisioning Use Cases
 
 **Scenario 1: Fresh Debian VM with Ansible**
+
 1. Create zone from Debian template
 2. Upload Ansible playbook tar.gz
 3. Set provisioning config with `debian-netplan` recipe
 4. Kick off provisioning → Zone auto-configures network, runs Ansible playbook
 
 **Scenario 2: OmniOS Zone with Shell Scripts**
+
 1. Create zone from OmniOS template
 2. Upload scripts tar.gz
 3. Set provisioning config with `omnios-dladm` recipe and `shell` provisioner
 4. Kick off provisioning → Zone configures network, runs setup scripts
 
 **Scenario 3: Cloud-Init Only (No Zlogin)**
+
 1. Create zone with cloud-init attributes set
 2. Set provisioning config with `cloud-init-wait` recipe (no zlogin automation)
 3. Kick off provisioning → Pipeline waits for cloud-init, then syncs files and runs provisioners
 
 ### Related Documentation
 
-- **[Provisioning Pipeline Guide](provisioning.md)** — Complete provisioning system documentation
-- **[Network Management Guide](network-management.md)** — NAT, DHCP, provisioning network setup
+- **[Provisioning Pipeline Guide](../provisioning/)** — Complete provisioning system documentation
+- **[Network Management Guide](../network-management/)** — NAT, DHCP, provisioning network setup
 - **Provisioning recipes** — `GET /provisioning/recipes` for available recipes
 
 ---
@@ -654,6 +665,7 @@ curl -X DELETE https://your-server:5001/zones/web-server-01 \
 ```
 
 **What happens:**
+
 1. Zone halted (if running)
 2. Zone uninstalled (`zoneadm uninstall -F`)
 3. Zone configuration removed (`zonecfg delete -F`)
@@ -671,6 +683,7 @@ curl -X DELETE "https://your-server:5001/zones/web-server-01?cleanup_datasets=tr
 ```
 
 **What happens:**
+
 1. Zone halted (if running)
 2. Zone configuration read to identify all datasets
 3. Zone uninstalled
@@ -683,6 +696,7 @@ curl -X DELETE "https://your-server:5001/zones/web-server-01?cleanup_datasets=tr
 6. Database record removed
 
 **Safety considerations:**
+
 - ✅ Only destroys datasets within the zone's own hierarchy (e.g., `rpool/zones/web-server-01/*`)
 - ✅ Does NOT destroy datasets attached via `existing_dataset` (external storage not owned by the zone)
 - ⚠️ **Irreversible** — All data in destroyed datasets is permanently lost
@@ -691,12 +705,14 @@ curl -X DELETE "https://your-server:5001/zones/web-server-01?cleanup_datasets=tr
 ### When to Use Cleanup
 
 **Use `cleanup_datasets=true` when:**
+
 - Zone is temporary (testing, CI/CD, ephemeral workloads)
 - You're certain the data is no longer needed
 - You want a complete clean slate (no orphaned datasets)
 - Storage space is limited and you need to reclaim space immediately
 
 **Do NOT use cleanup when:**
+
 - Zone data might be needed later (backups, forensics, rollback)
 - Datasets are shared with other systems (e.g., NFS-exported zvols)
 - You want to re-attach storage to a new zone later
@@ -728,12 +744,14 @@ curl https://your-server:5001/zones/test-zone \
 If delete fails partway through:
 
 1. **Check zone status:**
+
    ```bash
    # On host
    pfexec zoneadm list -cv
    ```
 
 2. **Manually complete cleanup:**
+
    ```bash
    # On host
    pfexec zoneadm -z test-zone uninstall -F
@@ -751,7 +769,5 @@ If delete fails partway through:
 
 ## Related Documentation
 
-- [Provisioning Pipeline Guide](provisioning.md) — Automated zone configuration
-- [Network Management Guide](network-management.md) — NAT, DHCP, provisioning network
-- [VNC Console Guide](vnc-console.md) — Graphical access to zones
-- [Template Management](templates.md) — Creating and managing zone templates
+- [Provisioning Pipeline Guide](../provisioning/) — Automated zone configuration
+- [Network Management Guide](../network-management/) — NAT, DHCP, provisioning network

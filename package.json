@@ -5,12 +5,24 @@
   "description": "Unified documentation site for the Hyperweaver platform",
   "type": "module",
   "scripts": {
-    "generate-docs": "node scripts/generate-docs.js"
+    "generate-docs": "node scripts/generate-docs.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "keywords": [
     "hyperweaver",
     "documentation"
   ],
   "author": "Makr91",
-  "license": "GPL-3.0"
+  "license": "GPL-3.0",
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.6.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "globals": "^17.7.0",
+    "prettier": "^3.6.2"
+  }
 }
