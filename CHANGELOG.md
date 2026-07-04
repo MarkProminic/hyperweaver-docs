@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.4](https://github.com/MarkProminic/hyperweaver-docs/compare/v0.1.3...v0.1.4) (2026-07-04)
+
+
+### Bug Fixes
+
+* fixing lint issues ([114f034](https://github.com/MarkProminic/hyperweaver-docs/commit/114f034e44374524e1de9caeed18aeb49f2ef2ba))
+* UI Upgrades, API prepartion, Doc Updates ([565af4b](https://github.com/MarkProminic/hyperweaver-docs/commit/565af4b1d2fe19dc60cfce3619431ecaede753d5))
+
 ## [0.1.3](https://github.com/MarkProminic/hyperweaver-docs/compare/v0.1.2...v0.1.3) (2026-07-03)
 
 
