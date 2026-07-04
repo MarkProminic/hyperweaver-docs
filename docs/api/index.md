@@ -44,7 +44,7 @@ The Hyperweaver Server API is fully documented using OpenAPI 3.0 specification.
 
 ### Interactive Documentation
 
-- **[Live API Reference](swagger-ui.html)** - Complete interactive API documentation (spec loaded live from the latest release)
+- **[Live API Reference](/api-docs)** - The Hyperweaver Server's live, dark-themed Swagger UI, served by the running backend
 - **[Download OpenAPI Spec](https://github.com/Makr91/hyperweaver-server/releases/latest/download/openapi.json)** - Raw OpenAPI specification for tools and integrations
 
 ### API Categories

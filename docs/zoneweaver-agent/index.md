@@ -15,6 +15,7 @@ The Zoneweaver Agent is the Bhyve/OmniOS host agent of the Hyperweaver platform:
 ## In this section
 
 - [API Reference](api/) - RESTful endpoints for zones, networking, storage, and monitoring
+- [Capability Model](capability-model/) - Status/capability tokens the Hyperweaver UI consumes (contract C7)
 - [Agent Guides](guides/) - Installation, authentication, zone/network management, provisioning
 - [Configuration](configuration/) - Complete configuration file reference
 - [Releases](releases/) - Download the latest OmniOS package

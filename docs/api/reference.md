@@ -8,22 +8,22 @@ permalink: /api/reference/
 
 # Interactive API Reference
 
-<div style="width: 100%; height: 800px; border: none; margin: 0; padding: 0;">
-  <iframe
-    src="../swagger-ui.html"
-    style="width: 100%; height: 100%; border: none; background: white;"
-    title="Hyperweaver Server API Reference">
-    <p>Your browser does not support iframes.
-       <a href="../swagger-ui.html">Click here to view the API documentation</a>
-    </p>
-  </iframe>
-</div>
+The interactive API reference is served **live by the running backend** at
+[`/api-docs`](/api-docs) — a dark-themed Swagger UI with full request/response
+schemas and "Try it out", always matching the deployed version.
 
-## Alternative Formats
+- **Hyperweaver Server** — [`/api-docs`](/api-docs) documents the Server's own API.
+- **A specific agent** — open **API Reference → Agent API** in the app sidebar (or
+  [`/agent/api-docs`](/agent/api-docs)). It resolves to the host you've selected in the
+  navbar, and the Server relays that agent's live spec.
+- **Standalone agent (Direct mode)** — [`/api-docs`](/api-docs) is that agent's own API.
 
-- **[View Full Screen](../swagger-ui.html)** - Open Swagger UI in a new page for better experience
-- **[Download OpenAPI Spec](https://github.com/Makr91/hyperweaver-server/releases/latest/download/openapi.json)** - Raw OpenAPI 3.0 specification file
+## Download the spec
+
+- **[Hyperweaver Server OpenAPI](https://github.com/Makr91/hyperweaver-server/releases/latest/download/openapi.json)** — raw OpenAPI 3.0 specification
+- **[Zoneweaver Agent OpenAPI](https://github.com/Makr91/zoneweaver-agent/releases/latest/download/openapi.json)** — raw OpenAPI 3.0 specification
 
 ---
 
-_The interactive API documentation above allows you to explore all available endpoints, view request/response schemas, and test API calls directly from your browser._
+_The interactive reference lets you explore every endpoint, view schemas, and test calls
+from your browser. It's served live by the backend, so it never goes stale._

@@ -45,7 +45,7 @@ The Zoneweaver Agent is fully documented using OpenAPI 3.0 specification.
 
 ### Interactive Documentation
 
-- **[Live API Reference](swagger-ui.html)** - Complete interactive API documentation with examples and testing capabilities (spec fetched live from the agent's latest release)
+- **[Live API Reference](/api-docs)** - The agent's live, dark-themed Swagger UI. On a Hyperweaver Server, open **API Reference → Agent API** in the app sidebar (or [`/agent/api-docs`](/agent/api-docs)) to view the API of the host you've selected in the navbar — the Server relays that agent's live spec
 - **[OpenAPI JSON](https://github.com/Makr91/zoneweaver-agent/releases/latest/download/openapi.json)** - Raw OpenAPI specification for tools and integrations
 
 ### API Categories

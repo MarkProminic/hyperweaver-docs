@@ -54,7 +54,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Generate docs assets (Swagger shells + changelogs)
+      - name: Generate docs assets (changelogs)
         run: npm run generate-docs
 
       - name: Setup Ruby
@@ -78,7 +78,7 @@ jobs:
             --no-enforce-https \
             --allow-hash-href \
             --swap-urls "^/docs:" \
-            --ignore-urls "/favicon.ico,/images/logo192.png,/images/logo512.png"
+            --ignore-urls "/favicon.ico,/images/logo192.png,/images/logo512.png,/^\/api-docs/,/^\/agent\/api-docs/"
 
   codeql-analysis:
     name: CodeQL

@@ -13,17 +13,19 @@ no per-backend docs pipeline.
 
 - **Prose is static** (guides, configuration references, API overviews) — rendered
   by Jekyll at build.
-- **Everything volatile is fetched live in the browser** (`head_custom.html`):
-  version + releases + changelog from each component's GitHub, and each component's
-  OpenAPI spec loaded by its Swagger UI shell from that component's published
-  release asset. No spec/changelog is ever baked in, so nothing goes stale and the
-  docs build has **zero backend source coupling**.
+- **Version + releases are fetched live in the browser** (`head_custom.html`) from
+  each component's GitHub; the **changelogs** are pulled at build by
+  `scripts/generate-docs.js`. Nothing goes stale and the docs build has **zero
+  backend source coupling**.
+- **The API reference is not embedded here.** It's served live by each backend at
+  **`/api-docs`** (dark-themed Swagger UI); a Hyperweaver Server additionally relays
+  a selected agent's spec at **`/agent/api-docs`**. The app's sidebar links to both.
 
 ## Local build
 
 ```bash
 bundle install
-npm run generate-docs        # emits the Swagger UI shells
+npm run generate-docs        # fetches the component changelogs
 JEKYLL_ENV=production bundle exec jekyll build
 # output in _site/ ; served in-app under /docs (baseurl)
 ```
@@ -32,7 +34,7 @@ JEKYLL_ENV=production bundle exec jekyll build
 
 - `docs/` — the documentation pages (server + `zoneweaver-agent/` section)
 - `_config.yml` — Jekyll + Just the Docs config (`baseurl: /docs`)
-- `head_custom.html` — the runtime GitHub fetch loaders (version/releases/changelog)
-- `scripts/generate-docs.js` — emits the Swagger UI shells (backend-agnostic)
+- `head_custom.html` — the runtime GitHub fetch loaders (version/releases)
+- `scripts/generate-docs.js` — fetches the component changelogs at build
 - root community files (`SUPPORT.md`, `CODE_OF_CONDUCT.md`, …) — `{% include %}`-d
   into their `docs/*.md` wrapper pages
