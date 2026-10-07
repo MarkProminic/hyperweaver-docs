@@ -10,12 +10,14 @@ permalink: /zoneweaver-agent/capability-model/
 
 {: .no_toc }
 
-> **Agent API v1 — SHIPPED (2026-07-04, roadmap item 1).** This doc began as the item-2
-> mapping of the agent's status/capability surface and the C7 token vocabulary; the gaps it
-> recorded are now closed. `features` is **dynamic + complete** (21 tokens, config-aware), the
-> **`machines` noun is canonical** with `/zones/*` kept as this Node agent's alias (O1), a
-> **direct-mode role model** (`admin`/`operator`/`viewer`) is enforced, and the OpenAPI is
-> published as the versioned **Agent API v1** contract.
+> **Agent API v1 — SHIPPED (2026-07-04, roadmap item 1). De-zoned 2026-07-05 (sync-file
+> ruling: one path, one vocabulary).** This doc began as the item-2 mapping of the agent's
+> status/capability surface and the C7 token vocabulary; the gaps it recorded are now closed.
+> `features` is **dynamic + complete** (config-aware), the **`machines` noun is the ONLY
+> noun** — the `/zones/*` alias and every zone-flavored wire key were deleted (2026-07-05;
+> `machine_info`, `machine_name`, `allmachines`/`runningmachines`) — a **direct-mode role
+> model** (`admin`/`operator`/`viewer`) is enforced, and the OpenAPI is published as the
+> versioned **Agent API v1** contract.
 >
 > **Governing docs:** `hyperweaver-architecture.md` (§3.1, §4, §6, §7) and
 > `hyperweaver-item2-contract.md` (§2, §3 C7). This doc never overrides them. Code references
@@ -68,6 +70,11 @@ Emitting code: `controllers/StatusController.js` (`getStatus`); feature tokens b
   "console": ["vnc"], // capability: graphical VM console protocols
   "features": [
     // capability tokens — dynamic (platform ∧ config)
+    "machines",
+    "machine-create",
+    "machine-modify",
+    "machine-screenshot",
+    "services",
     "zfs",
     "vnics",
     "boot-environments",
@@ -75,21 +82,25 @@ Emitting code: `controllers/StatusController.js` (`getStatus`); feature tokens b
     "repositories",
     "swap",
     "time-sync",
-    "syslog",
     "system-users",
     "processes",
     "zlogin",
     "ssh",
     "host-terminal",
+    "host-power",
     "tasks",
     "provisioning",
+    "provisioner-registry",
     // config-gated (present only when the block is enabled):
     "fault-management",
     "devices",
+    "monitoring",
+    "syslog",
     "log-streaming",
     "file-browser",
     "artifacts",
     "templates",
+    "guest-agent",
   ],
   "uptime": 12345, // process uptime, seconds
 }
@@ -123,11 +134,12 @@ Drives the capability-driven noun (O1) — label rule = union over the visible s
 - contains only `virtualbox` → **"Machines"**
 - mixed chrome (Aggregated across both) → **"Machines"**
 
-**Routes (O1, shipped):** `machines` is the **canonical** noun — every machine-scoped route is
-registered at `/machines/*` AND kept at its legacy `/zones/*` alias on this Node agent
-(`routes/index.js` `withMachinesAlias`; the VNC WebSocket upgrade accepts both). The published
-Agent API v1 spec documents only the canonical `/machines/*` form. The UI **label** flips on
-this token; both nouns work on the wire against this agent.
+**Routes (O1 shipped; alias DELETED 2026-07-05 per the one-path ruling):** `machines` is the
+**only** noun — every machine-scoped route is registered at `/machines/*` and nothing answers
+at `/zones/*` (`withMachinesAlias` is deleted; the VNC WebSocket upgrade matcher accepts the
+machines spelling only). The published Agent API v1 spec documents `/machines/*` with
+`{machineName}` path params. The UI **label** still flips on this token ("Zones" wording on
+all-bhyve scopes is cosmetic); the wire is machines everywhere.
 
 ### 3.3 `console: string[]` — graphical VM console protocols
 
@@ -143,6 +155,10 @@ legitimately vanish on a mixed cluster:
 
 | Token               | Panel / surface it gates                                              | Agent endpoint(s)                                              | OmniOS-specific?     |
 | ------------------- | --------------------------------------------------------------------- | -------------------------------------------------------------- | -------------------- |
+| `machines`          | machine management (tree expansion, Machines page, dashboard counts)  | `/machines/*`                                                   | common               |
+| `machine-create`    | machine creation affordances                                          | `POST /machines`                                                | common (per-agent)   |
+| `machine-suspend`   | Suspend action (Go agent today; bhyve has no suspend — never emitted here) | `POST /machines/:m/suspend`                                | common (per-agent)   |
+| `services`          | SMF service management (added 2026-07-05; lands next agent session)   | `/services/*`                                                   | **yes**              |
 | `zfs`               | ZFS pools + datasets                                                  | `/storage/pools`, `/storage/datasets`, `/monitoring/storage/*` | **yes**              |
 | `vnics`             | VNIC/dladm networking (vnics, vlans, bridges, aggregates, etherstubs) | `/network/*`                                                   | **yes**              |
 | `fault-management`  | illumos FMA faults                                                    | `/system/fault-management/*`                                   | **yes**              |
@@ -158,7 +174,13 @@ legitimately vanish on a mixed cluster:
 | `provisioning`      | provisioning pipeline/profiles/recipes                                | `/provisioning/*`, `/machines/:m/provision`                    | **yes** (bhyve path) |
 | `devices`           | PCI device inventory + PPT passthrough                                | `/host/devices/*`, `/host/ppt-status`                          | **yes**              |
 | `ssh`               | in-guest SSH shell (WS)                                               | `/machines/:m/ssh/*`                                           | common*              |
-| `host-terminal`     | host PTY shell (Host Shell)                                           | `/terminal/*` + `/term/:id` WS                                 | common               |
+| `host-terminal`     | host PTY shell (Host Shell) — converged 2026-07-11 on the /term family; the cookie-era `/terminal/*` routes are DELETED | `/term/start`, `/term/sessions*` + `/term/:id` WS | common               |
+| `host-power`        | host power surface (status/uptime + shutdown/restart/poweroff/halt)   | `/system/host/*`                                               | common               |
+| `machine-modify`    | Edit modal / modify pipeline incl. the accrue-changes contract        | `PUT /machines/:m`, `/machines/:m/pending-changes*`            | common               |
+| `machine-screenshot`| no-session console screenshot (PNG)                                   | `GET /machines/:m/vnc/screenshot`                              | common               |
+| `provisioner-registry` | SHI-format provisioner package registry + registry-driven wizard  | `/provisioning/provisioners*`                                  | common               |
+| `guest-agent`       | QEMU guest-agent channel (live IPs, exec, clean shutdown, osinfo)     | `/machines/:m/guest/*`, `/machines/:m/guest-agent/setup`       | common (config-gated) |
+| `monitoring`        | host telemetry panels                                                 | `/monitoring/*`                                                | common               |
 | `tasks`             | task queue panel                                                      | `/tasks/*`                                                     | common               |
 | `log-streaming`     | live log tail (WS)                                                    | `/system/logs/:l/stream/*`                                     | common               |
 | `file-browser`      | filesystem browser                                                    | `/filesystem/*`                                                | common               |
@@ -169,12 +191,25 @@ legitimately vanish on a mixed cluster:
 console-access roadmap item. `host-terminal` spawns `bash` on OmniOS / `powershell.exe` on
 Windows — present on both agents.
 
-**All 21 tokens are now emitted** (Agent API v1): 15 platform tokens unconditionally
-(`PLATFORM_FEATURES`) and 6 config-gated tokens when their config block is enabled
-(`CONFIG_GATED_FEATURES`): `fault-management`↔`fault_management.enabled`,
-`devices`↔`host_monitoring.enabled`, `log-streaming`↔`system_logs.enabled`,
-`file-browser`↔`file_browser.enabled`, `artifacts`↔`artifact_storage.enabled`,
-`templates`↔`template_sources.enabled`.
+**Emission split:** platform tokens ride `PLATFORM_FEATURES` unconditionally (2026-07-11/12
+additions: `machine-modify`, `machine-screenshot`, `provisioner-registry`) and 9 config-gated
+tokens appear when their config block is enabled (`CONFIG_GATED_FEATURES`):
+`fault-management`↔`fault_management.enabled`, `devices`+`monitoring`↔`host_monitoring.enabled`,
+`syslog`+`log-streaming`↔`system_logs.enabled`, `file-browser`↔`file_browser.enabled`,
+`artifacts`↔`artifact_storage.enabled`, `templates`↔`template_sources.enabled`,
+`guest-agent`↔`guest_agent.enabled` (the per-machine channel itself is opt-in at create:
+`zones.guest_agent`, default off).
+Op-level tokens are per-agent by design: this agent never emits `machine-suspend` (no bhyve
+suspend surface). The Go hyperweaver-agent (as of 2026-07-09) emits `tasks`, `machines`,
+`machine-suspend`, `machine-create`, `machine-modify`, `machine-snapshots`,
+`machine-screenshot`, `swap`, `monitoring`, `processes`, `provisioning`,
+`provisioner-registry`, `secrets`, `templates`, `host-launchers`, and `host-terminal`
+unconditionally, plus config-gated `host-power` (`host_power.enabled`), `artifacts`
+(`artifact_storage.enabled`), and `file-browser` (`file_browser.enabled`) — the
+"OmniOS-specific?" column above describes THIS agent's exclusives, not what the Go agent
+lacks (e.g. `swap` and `processes` are live on both); the architecture doc's D14 token
+registry is authoritative for cross-agent state. **An absent token is a deliberate signal** —
+the Server passes `features[]` through verbatim and the UI never synthesizes tokens.
 
 ### 3.5 `auth: string[]` — accepted login mechanisms
 
@@ -279,9 +314,9 @@ remaining two WS classes (`log-stream`, `task-stream`) are data streams gated by
   (frozen; deliberately not release-stamped). The implementing app version lives in
   `info.x-app-version` (release-please-stamped; `scripts/sync-versions.js` targets only that
   key).
-- **Canonical noun:** the generated spec's `/zones/*` path keys are rewritten to `/machines/*`
-  at build time (`config/swagger.js`) — the contract documents one noun; the `/zones/*` alias is
-  a Node-agent implementation detail.
+- **Canonical noun (2026-07-05):** the swagger path-rewrite shim is deleted — controllers
+  document `/machines/*` with `{machineName}` params directly; there is no `/zones/*` anywhere,
+  in spec or on the wire.
 - **Delivery:** served live at `/api-docs/swagger.json` (+ Swagger UI at `/api-docs`);
   `npm run generate-openapi` writes `openapi.json`, published as a GitHub Release asset that
   this docs site renders. The Go hyperweaver-agent and the UI's generated types consume this
@@ -294,19 +329,26 @@ remaining two WS classes (`log-stream`, `task-stream`) are data streams gated by
 
 ## 6. Machines surface — shape the UI tree consumes
 
-Canonical paths shown; each also answers at `/zones/*` on this agent (§3.2).
+Canonical paths only — nothing answers at `/zones/*` (2026-07-05 ruling). Wire keys are
+de-zoned: list `machines`, detail `machine_info`, rows/filters `machine_name`, stats
+`allmachines`/`runningmachines`.
 
-- `GET /machines` (`controllers/ZoneManagement/ZoneQueryController.js`) → `{ zones: Zone[],
+- `GET /machines` (`controllers/ZoneManagement/ZoneQueryController.js`) → `{ machines: [],
 total }`. Filters: `?status=`, `?tag=`, `?orphaned=`.
-- `GET /machines/:name` → `{ zone_info, configuration, active_vnc_session, pending_tasks,
-system_status }`. Reconciles DB status against live `zoneadm` on read.
+- `GET /machines/:name` → `{ machine_info, configuration, active_vnc_session, pending_tasks,
+system_status, pending_changes }`. Reconciles DB status against live `zoneadm` on read;
+`configuration` is the live zadm view merged UNDER the DB document-store sections
+(settings/networks/disks/provisioner/…, 2026-07-11 authority fix); `pending_changes` is the
+accrued modify set (null when none).
 - **Machine status enum** (`models/ZoneModel.js`):
   `configured | incomplete | installed | ready | running | shutting_down | down`
   → the tree's **status dots**: `running`→green, `shutting_down`→amber,
   `ready/installed/configured`→grey, `down/incomplete`→red, `is_orphaned:true`→hollow/warning.
 - Tree/label fields: `name`, `zone_id`, `host`, `status`, `brand` (bhyve/kvm/lx/illumos),
   `vnc_port`, `is_orphaned`, `vm_type` (template|development|production|firewall|other),
-  `tags[]`, `notes`.
+  `tags[]`, `notes`. (`zone_id` stays by ruling: it is the hypervisor-NATIVE identifier —
+  bhyve's zone UUID — the same species as a VirtualBox machine GUID on the Go agent; each
+  hypervisor exposes its own native id where one exists.)
 - **Single-host:** every machine carries `host` but a bare agent manages one host (R4/D11); the
   Aggregated tree groups by host at the Server layer, not here.
 
